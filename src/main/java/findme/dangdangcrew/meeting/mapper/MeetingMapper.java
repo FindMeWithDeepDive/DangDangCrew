@@ -1,5 +1,6 @@
 package findme.dangdangcrew.meeting.mapper;
 
+import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
 import findme.dangdangcrew.meeting.dto.MeetingResponseDto;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @Component
 public class MeetingMapper {
-    public Meeting toEntity(MeetingResponseDto dto) {
+    public Meeting toEntity(MeetingRequestDto dto) {
         return Meeting.builder()
                 .meetingName(dto.getMeetingName())
                 .information(dto.getInformation())
