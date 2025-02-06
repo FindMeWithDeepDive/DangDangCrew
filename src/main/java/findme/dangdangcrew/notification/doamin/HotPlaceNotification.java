@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class HotPlaceNotification extends Notification{
-    private Long placeId;
+    private String placeId;
 
-    public HotPlaceNotification(Long targetUserId, Long placeId) {
+    public HotPlaceNotification(Long targetUserId, String placeId) {
         super(targetUserId, NotificationType.HOT_PLACE);
         this.placeId = placeId;
     }
