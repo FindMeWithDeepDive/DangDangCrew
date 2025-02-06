@@ -10,12 +10,21 @@ import java.time.LocalDateTime;
 public abstract class Notification {
     protected Long id;
     protected Long targetUserId;
+    protected String message;
+    protected boolean isRead;
     protected LocalDateTime createdAt;
     protected NotificationType notificationType;
 
-    public Notification(Long targetUserId, NotificationType notificationType) {
+    public Notification(
+            Long targetUserId,
+            String message,
+            boolean isRead,
+            NotificationType notificationType,
+            LocalDateTime createdAt) {
         this.targetUserId = targetUserId;
         this.notificationType = notificationType;
-        this.createdAt = LocalDateTime.now();
+        this.message = message;
+        this.isRead = isRead;
+        this.createdAt = createdAt;
     }
 }

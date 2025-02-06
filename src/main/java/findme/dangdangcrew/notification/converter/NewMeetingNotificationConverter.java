@@ -16,6 +16,9 @@ public class NewMeetingNotificationConverter implements NotificationConverter{
     public Notification convert(NotificationEntity notificationEntity) {
         return new NewMeetingNotification(
                 notificationEntity.getTargetUserId(),
-                notificationEntity.getMeetingId());
+                notificationEntity.getMessage(),
+                notificationEntity.isRead(),
+                notificationEntity.getMeetingId(),
+                notificationEntity.getCreatedAt());
     }
 }

@@ -16,7 +16,10 @@ public class ApplyNotificationConverter implements NotificationConverter{
     public Notification convert(NotificationEntity notificationEntity) {
         return new ApplyNotification(
                 notificationEntity.getTargetUserId(),
-                notificationEntity.getMeetingId()
-        );
+                notificationEntity.getMessage(),
+                notificationEntity.isRead(),
+                notificationEntity.getApplyUserId(),
+                notificationEntity.getMeetingId(),
+                notificationEntity.getCreatedAt());
     }
 }

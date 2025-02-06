@@ -2,9 +2,11 @@ package findme.dangdangcrew.notification.converter;
 
 import findme.dangdangcrew.notification.doamin.Notification;
 import findme.dangdangcrew.notification.doamin.NotificationEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class NotificationConverterFactory {
     private final List<NotificationConverter> converters;
 

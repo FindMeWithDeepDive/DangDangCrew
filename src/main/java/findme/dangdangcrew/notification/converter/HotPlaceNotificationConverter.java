@@ -16,7 +16,9 @@ public class HotPlaceNotificationConverter implements NotificationConverter {
     public Notification convert(NotificationEntity notificationEntity) {
         return new HotPlaceNotification(
                 notificationEntity.getTargetUserId(),
-                notificationEntity.getPlaceId()
-        );
+                notificationEntity.getMessage(),
+                notificationEntity.isRead(),
+                notificationEntity.getPlaceId(),
+                notificationEntity.getCreatedAt());
     }
 }
