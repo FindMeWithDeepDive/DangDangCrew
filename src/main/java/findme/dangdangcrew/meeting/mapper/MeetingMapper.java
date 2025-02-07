@@ -1,12 +1,14 @@
 package findme.dangdangcrew.meeting.mapper;
 
+import findme.dangdangcrew.meeting.dto.MeetingListResponseDto;
 import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
-import findme.dangdangcrew.meeting.dto.MeetingResponseDto;
+import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Component
@@ -21,14 +23,25 @@ public class MeetingMapper {
                 .build();
     }
 
-    public MeetingResponseDto toDto(Meeting meeting) {
-        return MeetingResponseDto.builder()
-                .meetingId(meeting.getMeetingId())
+    public MeetingDetailResponseDto toDto(Meeting meeting) {
+        return MeetingDetailResponseDto.builder()
+                .meetingId(meeting.getId())
                 .meetingName(meeting.getMeetingName())
                 .information(meeting.getInformation())
                 .maxPeople(meeting.getMaxPeople())
                 .curPeople(meeting.getCurPeople())
                 .createdAt(meeting.getCreatedAt())
                 .build();
+    }
+
+    public List<MeetingListResponseDto> toListDto(List<Meeting> meetings){
+        return meetings.stream()
+                .map(meeting -> MeetingListResponseDto.builder()
+                            .meetingId(meeting.getId())
+                            .meetingName(meeting.getMeetingName())
+                            .maxPeople(meeting.getMaxPeople())
+                            .curPeople(meeting.getCurPeople())
+                            .build())
+            .toList();
     }
 }
