@@ -18,14 +18,29 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage/{roomId}")
     @SendTo("/subscribe/chatroom/{roomId}")
     public ChatMessageResponseDto sendMessage(
-            @DestinationVariable String roomId,
+            @DestinationVariable Long roomId,
             @Payload ChatMessageRequestDto chatMessage) {
 
         return new ChatMessageResponseDto(
                 String.valueOf(roomId),
                 chatMessage.getSender(),
                 chatMessage.getMessage(),
-                LocalDateTime.now().format(formatter) // 현재 시간 추가
+                LocalDateTime.now().format(formatter)
+        );
+    }
+
+    @MessageMapping("/chat.enterRoom/{roomId}")
+    @SendTo("/subscribe/chatroom/{roomId}")
+    public ChatMessageResponseDto enterRoom(
+            @DestinationVariable Long roomId,
+            @Payload ChatMessageRequestDto chatMessage) {
+
+        String welcomeMessage = chatMessage.getSender() + "님이 입장하셨습니다.";
+        return new ChatMessageResponseDto(
+                String.valueOf(roomId),
+                "System", // 시스템 메시지
+                welcomeMessage,
+                LocalDateTime.now().format(formatter)
         );
     }
 }
