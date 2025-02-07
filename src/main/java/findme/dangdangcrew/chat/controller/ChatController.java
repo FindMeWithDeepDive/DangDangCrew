@@ -43,4 +43,19 @@ public class ChatController {
                 LocalDateTime.now().format(formatter)
         );
     }
+
+    @MessageMapping("/chat.leaveRoom/{roomId}")
+    @SendTo("/subscribe/chatroom/{roomId}")
+    public ChatMessageResponseDto leaveRoom(
+            @DestinationVariable Long roomId,
+            @Payload ChatMessageRequestDto chatMessage) {
+
+        String leaveMessage = chatMessage.getSender() + "님이 퇴장하셨습니다.";
+        return new ChatMessageResponseDto(
+                String.valueOf(roomId),
+                "System",
+                leaveMessage,
+                LocalDateTime.now().format(formatter)
+        );
+    }
 }
