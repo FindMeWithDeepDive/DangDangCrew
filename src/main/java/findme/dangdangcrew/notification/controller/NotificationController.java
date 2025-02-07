@@ -1,6 +1,6 @@
 package findme.dangdangcrew.notification.controller;
 
-import findme.dangdangcrew.notification.doamin.Notification;
+import findme.dangdangcrew.notification.domain.Notification;
 import findme.dangdangcrew.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 

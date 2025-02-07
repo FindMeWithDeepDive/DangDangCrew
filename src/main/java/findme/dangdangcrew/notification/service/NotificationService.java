@@ -1,8 +1,8 @@
 package findme.dangdangcrew.notification.service;
 
 import findme.dangdangcrew.notification.converter.NotificationConverterFactory;
-import findme.dangdangcrew.notification.doamin.Notification;
-import findme.dangdangcrew.notification.doamin.NotificationEntity;
+import findme.dangdangcrew.notification.domain.Notification;
+import findme.dangdangcrew.notification.domain.NotificationEntity;
 import findme.dangdangcrew.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,5 +37,12 @@ public class NotificationService {
 
         entity.markAsRead();
         return entity.getId();
+    }
+
+    // 알림 정보 저장
+    @Transactional
+    public void saveNotification(Notification notification){
+        NotificationEntity notificationEntity = converterFactory.convertToEntity(notification);
+        notificationRepository.save(notificationEntity);
     }
 }

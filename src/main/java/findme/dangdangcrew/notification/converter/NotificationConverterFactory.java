@@ -1,7 +1,7 @@
 package findme.dangdangcrew.notification.converter;
 
-import findme.dangdangcrew.notification.doamin.Notification;
-import findme.dangdangcrew.notification.doamin.NotificationEntity;
+import findme.dangdangcrew.notification.domain.Notification;
+import findme.dangdangcrew.notification.domain.NotificationEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,6 +24,14 @@ public class NotificationConverterFactory {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원되지 않는 알림 타입입니다."))
                 .convert(notificationEntity);
+    }
+
+    public NotificationEntity convertToEntity(Notification notification){
+        return converters.stream()
+                .filter(converters -> converters.canConvertToEntity(notification))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("지원되지 않는 알림 타입입니다."))
+                .convertToEntity(notification);
     }
 
 }

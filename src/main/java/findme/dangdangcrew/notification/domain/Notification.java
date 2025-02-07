@@ -1,4 +1,4 @@
-package findme.dangdangcrew.notification.doamin;
+package findme.dangdangcrew.notification.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,11 +16,13 @@ public abstract class Notification {
     protected NotificationType notificationType;
 
     public Notification(
+            Long id,
             Long targetUserId,
             String message,
             boolean isRead,
             NotificationType notificationType,
             LocalDateTime createdAt) {
+        this.id = id;
         this.targetUserId = targetUserId;
         this.notificationType = notificationType;
         this.message = message;

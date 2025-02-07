@@ -1,4 +1,4 @@
-package findme.dangdangcrew.notification.doamin;
+package findme.dangdangcrew.notification.domain;
 
 public enum NotificationType {
     MEETING_CREATED,

@@ -1,4 +1,4 @@
-package findme.dangdangcrew.notification.doamin;
+package findme.dangdangcrew.notification.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

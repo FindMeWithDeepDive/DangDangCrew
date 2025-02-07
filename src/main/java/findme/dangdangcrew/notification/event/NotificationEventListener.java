@@ -1,10 +1,8 @@
 package findme.dangdangcrew.notification.event;
 
-import findme.dangdangcrew.notification.doamin.ApplyNotification;
-import findme.dangdangcrew.notification.doamin.HotPlaceNotification;
-import findme.dangdangcrew.notification.doamin.NewMeetingNotification;
-import findme.dangdangcrew.notification.doamin.NotificationEntity;
+import findme.dangdangcrew.notification.domain.*;
 import findme.dangdangcrew.notification.repository.NotificationRepository;
+import findme.dangdangcrew.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 @Transactional
 public class NotificationEventListener {
 
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @EventListener
     public void handleNewMeetingNotification(NewMeetingEvent event) {
@@ -28,7 +26,7 @@ public class NotificationEventListener {
         LocalDateTime createdAt = LocalDateTime.now();
 
         // MeetingNotification 생성
-        NewMeetingNotification notification = new NewMeetingNotification(
+        Notification notification = new NewMeetingNotification(
                 event.targetUserId(),
                 message,
                 false,
@@ -36,10 +34,7 @@ public class NotificationEventListener {
                 createdAt
         );
 
-        // JPA 엔티티로 변환 후 저장
-        NotificationEntity entity = NewMeetingNotification.toEntity(notification);
-
-        notificationRepository.save(entity);
+        notificationService.saveNotification(notification);
     }
 
     @EventListener
@@ -51,7 +46,7 @@ public class NotificationEventListener {
         LocalDateTime createdAt = LocalDateTime.now();
 
         // MeetingNotification 생성
-        HotPlaceNotification notification = new HotPlaceNotification(
+        Notification notification = new HotPlaceNotification(
                 event.targetUserId(),
                 message,
                 false,
@@ -59,10 +54,7 @@ public class NotificationEventListener {
                 createdAt
         );
 
-        // JPA 엔티티로 변환 후 저장
-        NotificationEntity entity = HotPlaceNotification.toEntity(notification);
-
-        notificationRepository.save(entity);
+        notificationService.saveNotification(notification);
     }
 
     @EventListener
@@ -75,7 +67,7 @@ public class NotificationEventListener {
         LocalDateTime createdAt = LocalDateTime.now();
 
         // MeetingNotification 생성
-        ApplyNotification notification = new ApplyNotification(
+        Notification notification = new ApplyNotification(
                 event.targetUserId(),
                 message,
                 false,
@@ -84,9 +76,6 @@ public class NotificationEventListener {
                 createdAt
         );
 
-        // JPA 엔티티로 변환 후 저장
-        NotificationEntity entity = ApplyNotification.toEntity(notification);
-
-        notificationRepository.save(entity);
+        notificationService.saveNotification(notification);
     }
 }
