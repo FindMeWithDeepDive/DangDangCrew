@@ -11,10 +11,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
+    show-sql: true
   transaction:
     default-timeout: 30s
+
+  logging:
+    level:
+      org.hibernate.SQL: debug
+      org.hibernate.orm.jdbc.bind: trace
+
+kakao_api_key: 3e5e48a79a281327bcbf876ef6b4d5f8
 
 ---
 spring:

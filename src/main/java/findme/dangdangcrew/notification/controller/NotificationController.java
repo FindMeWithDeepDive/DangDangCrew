@@ -2,6 +2,7 @@ package findme.dangdangcrew.notification.controller;
 
 import findme.dangdangcrew.notification.domain.Notification;
 import findme.dangdangcrew.notification.service.NotificationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Tag(name = "[Notification] Notification API", description = "알림을 조회하고 읽음 처리합니다.")
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
