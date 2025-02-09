@@ -23,7 +23,7 @@ public class FavoritePlaceController {
     public ResponseEntity<String> registerFavoritePlace(@RequestParam("userId") Long userId,
                                                 @RequestBody PlaceRequestDto placeRequestDto){
         String message = favoritePlaceService.registerFavoritePlace(userId, placeRequestDto);
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(userId + "번 유저가 " + message + " 장소를 즐겨찾기 하였습니다.");
     }
 
     @GetMapping
