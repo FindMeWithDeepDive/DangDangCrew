@@ -23,7 +23,7 @@ spring:
       org.hibernate.SQL: debug
       org.hibernate.orm.jdbc.bind: trace
 
-kakao_api_key: 3e5e48a79a281327bcbf876ef6b4d5f8
+kakao_api_key: ${KAKAO-MAP-API-KEY}
 
 ---
 spring:
