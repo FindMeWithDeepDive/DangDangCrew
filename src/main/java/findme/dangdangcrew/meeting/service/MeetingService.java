@@ -115,7 +115,8 @@ public class MeetingService {
         UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
-        if (currentStatus == UserMeetingStatus.CANCELLED && newStatus == UserMeetingStatus.CONFIRMED) {
+        if ((currentStatus == UserMeetingStatus.CANCELLED || currentStatus == UserMeetingStatus.WAITING)
+                && newStatus == UserMeetingStatus.CONFIRMED) {
             meeting.increaseCurPeople();
         } else if (currentStatus == UserMeetingStatus.CONFIRMED && newStatus == UserMeetingStatus.CANCELLED) {
             meeting.decreaseCurPeople();
