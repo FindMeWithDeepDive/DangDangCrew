@@ -2,7 +2,6 @@ package findme.dangdangcrew.chat.service;
 
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,4 +26,8 @@ public class ChatRoomService {
         return chatRoom;
     }
 
+    public void leaveRoom(Long roomId) {
+        ChatRoom chatRoom = getChatRoom(roomId);
+        chatRoom.removeParticipant();
+    }
 }
