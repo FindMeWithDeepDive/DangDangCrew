@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/evaluation")
+@RequestMapping("/api/v1/evaluations")
 public class EvaluationController {
 
     private final EvaluationService evaluationService;

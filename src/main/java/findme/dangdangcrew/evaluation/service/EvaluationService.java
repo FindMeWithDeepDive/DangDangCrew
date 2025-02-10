@@ -4,7 +4,9 @@ import findme.dangdangcrew.evaluation.dto.EvaluationRequestDto;
 import findme.dangdangcrew.evaluation.dto.EvaluationResponseDto;
 import findme.dangdangcrew.evaluation.entity.Evaluation;
 import findme.dangdangcrew.evaluation.repository.EvaluationRepository;
+import findme.dangdangcrew.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -14,11 +16,14 @@ import java.util.stream.Collectors;
 public class EvaluationService {
 
     private final EvaluationRepository evaluationRepository;
+    private final UserRepository userRepository;
 
-    public EvaluationService(EvaluationRepository evaluationRepository) {
+    public EvaluationService(EvaluationRepository evaluationRepository, UserRepository userRepository) {
         this.evaluationRepository = evaluationRepository;
+        this.userRepository = userRepository;
     }
 
+    @Transactional
     public void createEvaluation(Long evaluatorId, EvaluationRequestDto requestDto) {
         Evaluation evaluation = new Evaluation(
                 requestDto.getTargetUserId(),
@@ -28,6 +33,12 @@ public class EvaluationService {
                 requestDto.getComment()
         );
         evaluationRepository.save(evaluation);
+
+        Double newAverageScore = evaluationRepository.findAverageScoreByUserId(requestDto.getTargetUserId());
+
+        if (newAverageScore != null) {
+            userRepository.updateUserScore(requestDto.getTargetUserId(), newAverageScore);
+        }
     }
 
     public EvaluationResponseDto getEvaluationsByUser(Long targetUserId) {
