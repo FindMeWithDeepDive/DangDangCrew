@@ -2,6 +2,8 @@ package findme.dangdangcrew.meeting.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -9,20 +11,38 @@ import java.time.LocalDateTime;
 @Table(name = "meeting")
 @Builder
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Meeting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long meetingId;
+    private Long id;
 
+    @Column(nullable = false)
     private String meetingName;
 
+    @Column(nullable = false)
     private String information;
 
+    @Column(nullable = false)
     private Integer maxPeople;
 
-    private Integer curPeople;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    private Integer curPeople = 1;
 
+    @CreatedDate
     private LocalDateTime createdAt;
+
+    public void increaseCurPeople() {
+        if(this.curPeople <= maxPeople) {
+            this.curPeople++;
+        }
+    }
+
+    public void decreaseCurPeople() {
+        if(this.curPeople > 0){
+            this.curPeople--;
+        }
+    }
 }

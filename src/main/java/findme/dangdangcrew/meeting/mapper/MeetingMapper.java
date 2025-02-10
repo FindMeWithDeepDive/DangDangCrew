@@ -1,13 +1,11 @@
 package findme.dangdangcrew.meeting.mapper;
 
-import findme.dangdangcrew.meeting.dto.MeetingListResponseDto;
-import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
-import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
+import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
+import findme.dangdangcrew.meeting.entity.UserMeeting;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -18,8 +16,7 @@ public class MeetingMapper {
                 .meetingName(dto.getMeetingName())
                 .information(dto.getInformation())
                 .maxPeople(dto.getMaxPeople())
-                .curPeople(dto.getCurPeople())
-                .createdAt(LocalDateTime.now())
+                .curPeople(1)
                 .build();
     }
 
@@ -34,14 +31,29 @@ public class MeetingMapper {
                 .build();
     }
 
-    public List<MeetingListResponseDto> toListDto(List<Meeting> meetings){
+    public List<MeetingBasicResponseDto> toListDto(List<Meeting> meetings){
         return meetings.stream()
-                .map(meeting -> MeetingListResponseDto.builder()
+                .map(meeting -> MeetingBasicResponseDto.builder()
                             .meetingId(meeting.getId())
                             .meetingName(meeting.getMeetingName())
                             .maxPeople(meeting.getMaxPeople())
                             .curPeople(meeting.getCurPeople())
                             .build())
             .toList();
+    }
+
+    public MeetingApplicationResponseDto toApplicationDto(UserMeeting userMeeting) {
+        return MeetingApplicationResponseDto.builder()
+                .meetingId(userMeeting.getMeeting().getId())
+                .userId(userMeeting.getUser().getId())
+                .userName(userMeeting.getUser().getName())
+                .status(userMeeting.getStatus())
+                .build();
+    }
+
+    public List<MeetingApplicationResponseDto> toListApplicationDto(List<UserMeeting> userMeetings) {
+        return userMeetings.stream()
+                .map(this::toApplicationDto)
+                .toList();
     }
 }

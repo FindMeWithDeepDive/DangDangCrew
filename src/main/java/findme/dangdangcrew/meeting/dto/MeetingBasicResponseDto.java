@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MeetingListResponseDto {
+public class MeetingBasicResponseDto {
     private Long meetingId;
 
     private String meetingName;
