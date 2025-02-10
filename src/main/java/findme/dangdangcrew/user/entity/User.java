@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -34,6 +35,13 @@ import java.time.LocalDateTime;
 
     @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    @Column(nullable = false)
+    private BigDecimal userScore = BigDecimal.ZERO;
+
+    public void updateScore(BigDecimal newScore) {
+        this.userScore = newScore;
+    }
 
     @CreatedDate
     @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
