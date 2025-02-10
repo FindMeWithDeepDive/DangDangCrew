@@ -37,12 +37,16 @@ public class Meeting {
     public void increaseCurPeople() {
         if(this.curPeople <= maxPeople) {
             this.curPeople++;
+        } else {
+            throw new IllegalArgumentException("현재 인원은 최대 인원(" + this.maxPeople + "명)을 초과할 수 없습니다.");
         }
     }
 
     public void decreaseCurPeople() {
         if(this.curPeople > 0){
             this.curPeople--;
+        } else {
+            throw new IllegalArgumentException("현재 인원은 1명 미만이 될 수 없습니다.");
         }
     }
 }
