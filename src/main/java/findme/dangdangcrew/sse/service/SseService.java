@@ -1,9 +1,11 @@
 package findme.dangdangcrew.sse.service;
 
 import findme.dangdangcrew.notification.domain.Notification;
+import findme.dangdangcrew.place.repository.PlaceRepository;
 import findme.dangdangcrew.sse.dto.EventPayload;
 import findme.dangdangcrew.sse.infrastructure.ClockHolder;
 import findme.dangdangcrew.sse.repository.EmitterRepository;
+import findme.dangdangcrew.sse.repository.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
