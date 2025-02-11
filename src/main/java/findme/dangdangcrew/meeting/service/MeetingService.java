@@ -8,6 +8,8 @@ import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.ApplyEvent;
+import findme.dangdangcrew.place.domain.Place;
+import findme.dangdangcrew.place.service.PlaceService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class MeetingService {
     private final UserMeetingService userMeetingService;
     private final UserRepository userRepository;
     private final EventPublisher eventPublisher;
+    private final PlaceService placeService;
 
     public Meeting findById(Long id) {
         return meetingRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
@@ -49,7 +52,8 @@ public class MeetingService {
     // 모임 생성
     @Transactional
     public MeetingApplicationResponseDto create(MeetingRequestDto meetingRequestDto, Long userId) {
-        Meeting meeting = meetingMapper.toEntity(meetingRequestDto);
+        Place place = placeService.findOrCreatePlace(meetingRequestDto.getPlaceRequestDto());
+        Meeting meeting = meetingMapper.toEntity(meetingRequestDto, place);
         meeting = meetingRepository.save(meeting);
 
         User user = userRepository.findById(userId).orElseThrow();
