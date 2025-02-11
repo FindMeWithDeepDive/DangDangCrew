@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-    List<Meeting> findAllByPlace_Id(String place_id);
+    List<Meeting> findAllByPlace_Id(String placeId);
 }
