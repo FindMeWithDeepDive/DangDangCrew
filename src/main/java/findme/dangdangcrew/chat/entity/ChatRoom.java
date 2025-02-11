@@ -1,15 +1,16 @@
 package findme.dangdangcrew.chat.entity;
 
+import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.user.entity.User;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,18 +24,15 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    @OneToOne
+    @JoinColumn(name = "meeting_id", nullable = false)
+    private Meeting meeting;
 
     private static final int MAX_PARTICIPANTS = 20;
     private int currentParticipants = 0;
 
-    public ChatRoom(User owner, String title) {
-        this.owner = owner;
-        this.title = title;
+    public ChatRoom(Meeting meeting) {
+        this.meeting = meeting;
         this.currentParticipants = 1; // 방장이 자동으로 입장
     }
 
