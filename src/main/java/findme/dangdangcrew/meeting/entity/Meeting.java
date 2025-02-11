@@ -1,5 +1,6 @@
 package findme.dangdangcrew.meeting.entity;
 
+import findme.dangdangcrew.place.domain.Place;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,6 +34,9 @@ public class Meeting {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    private Place place;
 
     public void increaseCurPeople() {
         if(this.curPeople <= maxPeople) {
