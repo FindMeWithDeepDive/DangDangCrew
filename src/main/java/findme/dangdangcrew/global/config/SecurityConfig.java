@@ -22,11 +22,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
-                                "/api/v1/**", "/ws/**"
+                                "/api/v1/**", "/ws/**","/test/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();

@@ -11,7 +11,7 @@ public class NewMeetingNotification extends Notification{
     private Long meetingId;
 
     public NewMeetingNotification(Long targetUserId,String message, boolean isRead, Long meetingId, LocalDateTime createdAt){
-        super(null, targetUserId,message,isRead ,NotificationType.MEETING_CREATED, createdAt);
+        super(null, targetUserId, message, isRead , NotificationType.MEETING_CREATED, createdAt);
         this.meetingId = meetingId;
     }
 

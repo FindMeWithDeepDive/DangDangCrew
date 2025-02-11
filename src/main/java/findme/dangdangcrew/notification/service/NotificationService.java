@@ -45,4 +45,12 @@ public class NotificationService {
         NotificationEntity notificationEntity = converterFactory.convertToEntity(notification);
         notificationRepository.save(notificationEntity);
     }
+
+    @Transactional
+    public void saveAllNotification(List<Notification> notifications) {
+        List<NotificationEntity> notificationEntities = notifications.stream()
+                .map(converterFactory::convertToEntity)
+                .collect(Collectors.toList());
+        notificationRepository.saveAll(notificationEntities);
+    }
 }

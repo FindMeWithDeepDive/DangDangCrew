@@ -16,11 +16,25 @@ public class EventTestController {
 
     private final EventPublisher eventPublisher;
 
-    @GetMapping
-    public String testEventApi(){
+    @GetMapping("/apply")
+    public String testApplyApi(){
         eventPublisher.publisher(new ApplyEvent(1L,"강형준",2L,1L,"강남역 카페 모임"));
-        eventPublisher.publisher(new HotPlaceEvent(1L,"강남역 카페","12345"));
-        eventPublisher.publisher(new NewMeetingEvent(1L,"강남역 카페",1L));
+
+        return "ok";
+    }
+
+
+    @GetMapping("/hot-place")
+    public String testHotPlaceApi(){
+        eventPublisher.publisher(new HotPlaceEvent("강남역 카페","12345"));
+
+        return "ok";
+    }
+
+
+    @GetMapping("/new-meeting")
+    public String testNewMeetingApi(){
+        eventPublisher.publisher(new NewMeetingEvent("강남역 카페",1L));
 
         return "ok";
     }

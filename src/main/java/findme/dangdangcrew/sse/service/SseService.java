@@ -1,20 +1,17 @@
 package findme.dangdangcrew.sse.service;
 
-import findme.dangdangcrew.notification.domain.Notification;
-import findme.dangdangcrew.place.repository.PlaceRepository;
-import findme.dangdangcrew.sse.dto.EventPayload;
 import findme.dangdangcrew.sse.infrastructure.ClockHolder;
 import findme.dangdangcrew.sse.repository.EmitterRepository;
-import findme.dangdangcrew.sse.repository.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -26,7 +23,16 @@ public class SseService {
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
 
+    // 알림을 저장하기 위한 연결된 userId 가져오는 로직
+    public Set<Long> getConnectedUserIds(){
+        return emitterRepository.findAllEmitters().keySet().stream()
+                .map(k -> Long.parseLong(k.split("_")[0]))
+                .collect(Collectors.toSet());
+    }
+    
     public SseEmitter subscribe(Long userId){
+        // 여러개의 SseEmitter를 관리하기 위해, 중복되지 않은 key값을 생성.
+        // 이를 통해 데이터 복구, 덮어쓰기 방지를 할 수 있다.
         String eventId = generateEventId(userId);
 
         SseEmitter sseEmitter = emitterRepository.save(eventId, new SseEmitter(TIMEOUT));
@@ -40,33 +46,37 @@ public class SseService {
         return sseEmitter;
     }
 
-    public void broadcast(EventPayload eventPayload){
-        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitters();
-
-        emitters.forEach((k,v)->{
-            try{
-                String eventId = generateEventId(Long.parseLong(k.split("_")[0]));
-                v.send(SseEmitter.event()
-                        .name("broadcast event")
-                        .id(eventId)
-                        .reconnectTime(RECONNECTION_TIMEOUT)
-                        .data(eventPayload, MediaType.APPLICATION_JSON));
-                emitterRepository.saveEvent(eventId, eventPayload);
-                log.info("sent notification, id={}, payload={}, eventId = {}", k, eventPayload, eventId);
-            }catch (IOException e){
-                log.error("fail to send emitter id = {}. {}", k, e.getMessage());
+    // 실시간 인기 장소 알림 비동기 처리
+    @Async
+    public void broadcastHotPlace(Set<Long> connectedUserIds, String message){
+        log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
+        connectedUserIds.forEach(userId -> {
+            SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
+            if (emitter != null) {
+                try {
+                    String eventId = generateEventId(userId);
+                    emitter.send(SseEmitter.event()
+                            .name("broadcast event")
+                            .id(eventId)
+                            .reconnectTime(RECONNECTION_TIMEOUT)
+                            .data(message, MediaType.APPLICATION_JSON));
+                    log.info("sent notification to userId={}, payload={}", userId, message);
+                } catch (IOException e) {
+                    log.error("fail to send emitter to userId={} - {}", userId, e.getMessage());
+                }
             }
         });
     }
 
-    // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림 기능
-    public void sendNotificationToClient(Long userId, Notification notification){
+    // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림
+    @Async
+    public void sendNotificationToClient(Long userId, String message){
         SseEmitter sseEmitter = emitterRepository.findEmitterByUserId(userId);
         if(sseEmitter != null){
             try {
                 sseEmitter.send(SseEmitter.event()
-                        .name("new-notification")
-                        .data(notification.getMessage()));
+                        .name("apply-notification")
+                        .data(message));
             }catch (IOException e){
                 emitterRepository.deleteAllEmittersStartWithUserId(userId);
             }
@@ -80,7 +90,6 @@ public class SseService {
             sseEmitter.send(event);
         }catch (IOException e){
             log.error("구독 실패, eventId ={}, {}", eventId, e.getMessage());
-
         }
     }
 
