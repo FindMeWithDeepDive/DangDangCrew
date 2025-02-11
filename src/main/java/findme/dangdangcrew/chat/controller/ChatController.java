@@ -2,8 +2,10 @@ package findme.dangdangcrew.chat.controller;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.dto.ChatMessageResponseDto;
+import findme.dangdangcrew.chat.service.ChatRoomService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,9 +13,11 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class ChatController {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final ChatRoomService chatRoomService;
 
     @MessageMapping("/chat.sendMessage/{roomId}")
     @SendTo("/subscribe/chatroom/{roomId}")
@@ -35,6 +39,8 @@ public class ChatController {
             @DestinationVariable Long roomId,
             @Payload ChatMessageRequestDto chatMessage) {
 
+        chatRoomService.enterRoom(roomId);
+
         String welcomeMessage = chatMessage.getSender() + "님이 입장하셨습니다.";
         return new ChatMessageResponseDto(
                 String.valueOf(roomId),
@@ -49,6 +55,8 @@ public class ChatController {
     public ChatMessageResponseDto leaveRoom(
             @DestinationVariable Long roomId,
             @Payload ChatMessageRequestDto chatMessage) {
+
+        chatRoomService.leaveRoom(roomId);
 
         String leaveMessage = chatMessage.getSender() + "님이 퇴장하셨습니다.";
         return new ChatMessageResponseDto(
