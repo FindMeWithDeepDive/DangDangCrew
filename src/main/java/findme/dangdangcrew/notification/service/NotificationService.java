@@ -1,5 +1,7 @@
 package findme.dangdangcrew.notification.service;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.notification.converter.NotificationConverterFactory;
 import findme.dangdangcrew.notification.domain.Notification;
 import findme.dangdangcrew.notification.domain.NotificationEntity;
@@ -33,7 +35,7 @@ public class NotificationService {
     @Transactional
     public Long readNotification(Long notificationId){
         NotificationEntity entity = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 알림이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
 
         entity.markAsRead();
         return entity.getId();

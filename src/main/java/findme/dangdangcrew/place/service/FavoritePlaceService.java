@@ -1,5 +1,7 @@
 package findme.dangdangcrew.place.service;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.place.domain.FavoritePlace;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.place.dto.FavoritePlaceResponseDto;
@@ -27,13 +29,13 @@ public class FavoritePlaceService {
     @Transactional
     public String registerFavoritePlace(Long userId, PlaceRequestDto placeRequestDto){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Place place = placeService.findOrCreatePlace(placeRequestDto);
 
         if(favoritePlaceRepository.existsByUserAndPlace(user,place)){
             log.info("이미 즐겨찾기한 장소입니다. - userId: {}, placeId: {}", user.getId(), place.getId());
-            throw new IllegalStateException("이미 즐겨찾기한 장소입니다.");
+            throw new CustomException(ErrorCode.ALREADY_FAVORITE_PLACE);
         }
 
         FavoritePlace favoritePlace = FavoritePlace.builder()
@@ -48,7 +50,7 @@ public class FavoritePlaceService {
     }
 
     public List<FavoritePlaceResponseDto> getAllFavoritePlace(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("유저가 존재하지 않습니다."));
+        User user = userRepository.findById(userId).orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllWithPlaceByUser(user);
 
         return favoritePlaces.stream()
