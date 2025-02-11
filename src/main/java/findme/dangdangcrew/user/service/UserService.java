@@ -1,19 +1,27 @@
 package findme.dangdangcrew.user.service;
 
+import findme.dangdangcrew.global.config.JwtTokenProvider;
+import findme.dangdangcrew.user.dto.LoginRequestDto;
+import findme.dangdangcrew.user.dto.TokenResponseDto;
 import findme.dangdangcrew.user.dto.UserRequestDto;
 import findme.dangdangcrew.user.dto.UserResponseDto;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final StringRedisTemplate redisTemplate;
 
     @Transactional
     public UserResponseDto registerUser(UserRequestDto userRequestDto) {
@@ -46,6 +54,22 @@ public class UserService {
         userRepository.save(user);
 
         return new UserResponseDto(user.getId(), user.getEmail(), user.getName(), user.getNickname(), user.getPhoneNumber(), user.getCreatedAt());
+    }
+
+    public TokenResponseDto authenticate(LoginRequestDto request) {
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+
+        redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
+
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 
 }

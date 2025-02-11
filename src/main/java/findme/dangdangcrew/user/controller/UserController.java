@@ -1,5 +1,7 @@
 package findme.dangdangcrew.user.controller;
 
+import findme.dangdangcrew.user.dto.LoginRequestDto;
+import findme.dangdangcrew.user.dto.TokenResponseDto;
 import findme.dangdangcrew.user.dto.UserRequestDto;
 import findme.dangdangcrew.user.dto.UserResponseDto;
 import findme.dangdangcrew.user.service.UserService;
@@ -24,6 +26,12 @@ public class UserController {
     public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         UserResponseDto userResponseDto = userService.registerUser(userRequestDto);
         return ResponseEntity.ok(userResponseDto);
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력받아 JWT 토큰을 발급합니다.")
+    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(userService.authenticate(request));
     }
 
 }
