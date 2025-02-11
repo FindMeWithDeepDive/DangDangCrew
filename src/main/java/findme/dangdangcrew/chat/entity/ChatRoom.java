@@ -32,6 +32,12 @@ public class ChatRoom {
     private static final int MAX_PARTICIPANTS = 20;
     private int currentParticipants = 0;
 
+    public ChatRoom(User owner, String title) {
+        this.owner = owner;
+        this.title = title;
+        this.currentParticipants = 1; // 방장이 자동으로 입장
+    }
+
     public boolean addParticipant() {
         if (currentParticipants < MAX_PARTICIPANTS) {
             currentParticipants++;
