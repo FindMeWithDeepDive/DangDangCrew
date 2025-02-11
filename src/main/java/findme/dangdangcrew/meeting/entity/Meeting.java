@@ -35,7 +35,7 @@ public class Meeting {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Place place;
 
     public void increaseCurPeople() {
