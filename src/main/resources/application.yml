@@ -25,6 +25,16 @@ spring:
       org.springframework.web.socket: DEBUG
       org.springframework.messaging: DEBUG
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: ${JWT-SECRET}
+  access-token-validity: 1800000 # 30 minutes
+  refresh-token-validity: 604800000 # 7 days
+
 kakao_api_key: ${KAKAO-MAP-API-KEY}
 
 

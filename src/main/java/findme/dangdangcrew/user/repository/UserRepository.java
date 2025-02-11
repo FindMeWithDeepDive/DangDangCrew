@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.userScore = :newScore WHERE u.id = :userId")
     void updateUserScore(@Param("userId") Long userId, @Param("newScore") Double newScore);
+
+    Optional<User> findByEmail(String email);
 }
