@@ -49,6 +49,7 @@ public class SseService {
     // 실시간 인기 장소 알림 비동기 처리
     @Async
     public void broadcastHotPlace(Set<Long> connectedUserIds, String message){
+        log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
         connectedUserIds.forEach(userId -> {
             SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
             if (emitter != null) {
