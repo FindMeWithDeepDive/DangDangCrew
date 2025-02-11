@@ -151,4 +151,10 @@ public class MeetingService {
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
         return meetingMapper.toListApplicationDto(userMeetings);
     }
+
+    // 장소별 모임 조회
+    public List<MeetingBasicResponseDto> findMeetingsByPlaceId(String placeId) {
+        List<Meeting> meetings = meetingRepository.findAllByPlace_Id(placeId);
+        return meetingMapper.toListDto(meetings);
+    }
 }

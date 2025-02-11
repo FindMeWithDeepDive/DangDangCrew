@@ -1,9 +1,6 @@
 package findme.dangdangcrew.meeting.controller;
 
-import findme.dangdangcrew.meeting.dto.MeetingApplicationResponseDto;
-import findme.dangdangcrew.meeting.dto.MeetingApplicationUpdateRequestDto;
-import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
-import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
+import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +55,12 @@ public class MeetingController {
     @GetMapping("/{meetingId}/confirmed")
     public ResponseEntity<List<MeetingApplicationResponseDto>> getConfirmedMeetingApplications(@PathVariable("meetingId") Long meetingId){
         List<MeetingApplicationResponseDto> response = meetingService.readAllConfirmed(meetingId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MeetingBasicResponseDto>> getAllMeetingsByPlaceId(@RequestParam String placeId){
+        List<MeetingBasicResponseDto> response = meetingService.findMeetingsByPlaceId(placeId);
         return ResponseEntity.ok(response);
     }
 }
