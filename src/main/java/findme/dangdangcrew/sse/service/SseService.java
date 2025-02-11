@@ -23,7 +23,7 @@ public class SseService {
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
 
-    // 알림을 저장하기 위한 연결된 userId 가져오는 로직 
+    // 알림을 저장하기 위한 연결된 userId 가져오는 로직
     public Set<Long> getConnectedUserIds(){
         return emitterRepository.findAllEmitters().keySet().stream()
                 .map(k -> Long.parseLong(k.split("_")[0]))
@@ -89,7 +89,6 @@ public class SseService {
             sseEmitter.send(event);
         }catch (IOException e){
             log.error("구독 실패, eventId ={}, {}", eventId, e.getMessage());
-
         }
     }
 
