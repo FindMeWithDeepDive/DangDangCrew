@@ -25,7 +25,7 @@ public class ChatRoom {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "meeting_id", nullable = false)
+    @JoinColumn(name = "meeting_id", nullable = false, unique = true)
     private Meeting meeting;
 
     private static final int MAX_PARTICIPANTS = 20;
