@@ -13,5 +13,8 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     boolean existsByUserAndPlace(User user, Place place);
 
     @Query("SELECT fp FROM FavoritePlace fp JOIN FETCH fp.place WHERE fp.user = :user")
-    List<FavoritePlace> findAllWithPlaceByUser(@Param("user") User user);
+    List<FavoritePlace> findAllByUser(@Param("user") User user);
+
+    @Query("SELECT fp FROM FavoritePlace fp JOIN FETCH fp.user WHERE fp.place.id = :placeId")
+    List<FavoritePlace> findAllByPlaceId(@Param("placeId") String placeId);
 }

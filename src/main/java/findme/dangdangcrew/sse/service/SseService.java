@@ -68,6 +68,28 @@ public class SseService {
         });
     }
 
+    // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
+    @Async
+    public void broadcastNewMeeting(Set<Long> connectedUserIds, String message){
+        log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
+        connectedUserIds.forEach(userId -> {
+            SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
+            if (emitter != null) {
+                try {
+                    String eventId = generateEventId(userId);
+                    emitter.send(SseEmitter.event()
+                            .name("broadcast event")
+                            .id(eventId)
+                            .reconnectTime(RECONNECTION_TIMEOUT)
+                            .data(message, MediaType.APPLICATION_JSON));
+                    log.info("sent notification to userId={}, payload={}", userId, message);
+                } catch (IOException e) {
+                    log.error("fail to send emitter to userId={} - {}", userId, e.getMessage());
+                }
+            }
+        });
+    }
+
     // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림
     @Async
     public void sendNotificationToClient(Long userId, String message){
