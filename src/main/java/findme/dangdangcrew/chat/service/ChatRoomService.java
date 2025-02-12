@@ -3,6 +3,7 @@ package findme.dangdangcrew.chat.service;
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
+import findme.dangdangcrew.meeting.entity.Meeting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,5 +43,9 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
         return chatRoom;
+    }
+
+    public void createChatRoom(Meeting meeting) {
+        chatRoomRepository.save(new ChatRoom(meeting));
     }
 }

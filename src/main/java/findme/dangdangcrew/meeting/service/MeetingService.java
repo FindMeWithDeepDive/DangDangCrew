@@ -1,5 +1,8 @@
 package findme.dangdangcrew.meeting.service;
 
+import findme.dangdangcrew.chat.entity.ChatRoom;
+import findme.dangdangcrew.chat.repository.ChatRoomRepository;
+import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
@@ -39,6 +42,7 @@ public class MeetingService {
     private final UserRepository userRepository;
     private final EventPublisher eventPublisher;
     private final PlaceService placeService;
+    private final ChatRoomService chatRoomService;
 
     public Meeting findById(Long id) {
         return meetingRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
@@ -55,6 +59,7 @@ public class MeetingService {
         Place place = placeService.findOrCreatePlace(meetingRequestDto.getPlaceRequestDto());
         Meeting meeting = meetingMapper.toEntity(meetingRequestDto, place);
         meeting = meetingRepository.save(meeting);
+        chatRoomService.createChatRoom(meeting);
 
         User user = userRepository.findById(userId).orElseThrow();
         UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.LEADER);
