@@ -1,5 +1,6 @@
 package findme.dangdangcrew.chat.service;
 
+import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,18 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
 
+    public String processChat(ChatMessageRequestDto chatMessage, Long roomId) {
+        if (chatMessage.getType() == ChatMessageRequestDto.MessageType.ENTER) {
+            enterRoom(roomId);
+            return chatMessage.getSender() + "님이 입장하셨습니다.";
+        }
+        if (chatMessage.getType() == ChatMessageRequestDto.MessageType.LEAVE) {
+            leaveRoom(roomId);
+            return chatMessage.getSender() + "님이 퇴장하셨습니다.";
+        }
+        return chatMessage.getMessage();
+    }
+
     public void enterRoom(Long roomId) {
         ChatRoom chatRoom = getChatRoom(roomId);
         if (!chatRoom.addParticipant()) {
@@ -20,14 +33,14 @@ public class ChatRoomService {
         }
     }
 
+    public void leaveRoom(Long roomId) {
+        ChatRoom chatRoom = getChatRoom(roomId);
+        chatRoom.removeParticipant();
+    }
+
     private ChatRoom getChatRoom(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
         return chatRoom;
-    }
-
-    public void leaveRoom(Long roomId) {
-        ChatRoom chatRoom = getChatRoom(roomId);
-        chatRoom.removeParticipant();
     }
 }
