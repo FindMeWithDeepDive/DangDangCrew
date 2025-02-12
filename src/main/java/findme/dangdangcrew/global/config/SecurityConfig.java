@@ -24,6 +24,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
                                 "/api/v1/**", "/ws/**","/test/**"
                         ).permitAll()
+                        .requestMatchers("/api/v1/users/logout").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable);
