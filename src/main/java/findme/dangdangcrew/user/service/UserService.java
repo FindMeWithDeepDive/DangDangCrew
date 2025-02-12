@@ -1,10 +1,7 @@
 package findme.dangdangcrew.user.service;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
-import findme.dangdangcrew.user.dto.LoginRequestDto;
-import findme.dangdangcrew.user.dto.TokenResponseDto;
-import findme.dangdangcrew.user.dto.UserRequestDto;
-import findme.dangdangcrew.user.dto.UserResponseDto;
+import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +67,24 @@ public class UserService {
         redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
 
         return new TokenResponseDto(accessToken, refreshToken);
+    }
+
+    public TokenResponseDto refreshAccessToken(TokenRefreshRequestDto request) {
+        String refreshToken = request.getRefreshToken();
+
+        // 1.Refresh Token에서 이메일 추출
+        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+        // 2.Redis에 저장된 Refresh Token과 비교
+        String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
+        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+            throw new RuntimeException("Invalid or expired refresh token. Please log in again.");
+        }
+
+        // 3.새로운 Access Token 발급
+        String newAccessToken = jwtTokenProvider.generateAccessToken(email);
+
+        return new TokenResponseDto(newAccessToken, refreshToken);
     }
 
 }
