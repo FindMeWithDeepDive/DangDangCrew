@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User API", description = "사용자 관련 API")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class); // ✅ Logger 선언 추가
     private final UserService userService;
 
     @PostMapping("/signup")
@@ -37,5 +41,21 @@ public class UserController {
         TokenResponseDto response = userService.refreshAccessToken(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃을 수행하고 Refresh Token을 삭제합니다.")
+    public ResponseEntity<Void> logout(@RequestHeader(value = "authorization", required = false) String token) {
+        logger.info("🚀 Received Authorization Header: {}", token);
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            logger.error("❌ Missing or invalid Authorization header");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        String accessToken = token.substring(7).trim();
+        userService.logout(accessToken);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

@@ -1,10 +1,13 @@
 package findme.dangdangcrew.user.service;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
+import findme.dangdangcrew.user.controller.UserController;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final StringRedisTemplate redisTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
 
     @Transactional
     public UserResponseDto registerUser(UserRequestDto userRequestDto) {
@@ -85,6 +90,19 @@ public class UserService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(email);
 
         return new TokenResponseDto(newAccessToken, refreshToken);
+    }
+
+    public void logout(String accessToken) {
+        // Access Token에서 사용자 이메일 추출
+        String email = jwtTokenProvider.getEmailFromToken(accessToken);
+        // Redis에서 Refresh Token 삭제
+        Boolean isDeleted = redisTemplate.delete("refresh:" + email);
+
+        if (Boolean.TRUE.equals(isDeleted)) {
+            logger.info("✅ Refresh Token for {} successfully deleted from Redis", email);
+        } else {
+            logger.warn("❌ Failed to delete Refresh Token for {} or token does not exist", email);
+        }
     }
 
 }
