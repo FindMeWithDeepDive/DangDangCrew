@@ -35,7 +35,7 @@ public class NotificationEventListener {
         // 생성 시각
         LocalDateTime createdAt = LocalDateTime.now();
 
-        // 미팅이 생성된 장소 정보 조회 -> 해당 장소를 즐겨찾기 한 유저 찾기
+        // 해당 장소를 즐겨찾기 한 유저 찾기
         List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllByPlaceId(event.placeId());
         Set<Long> userIds = favoritePlaces.stream()
                 .map(favoritePlace -> favoritePlace.getUser().getId())
