@@ -1,5 +1,7 @@
 package findme.dangdangcrew.place.service;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.place.dto.PlaceRequestDto;
 import findme.dangdangcrew.place.dto.PlaceResponseDto;
@@ -77,13 +79,13 @@ public class PlaceService {
      */
     private List<Map<String, Object>> extractDocuments(Map<String, Object> kakaoResponse) {
         if (kakaoResponse == null || !kakaoResponse.containsKey("documents")) {
-            throw new IllegalArgumentException("Kakao API 응답에서 'documents' 필드를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.DOCUMENTS_NOT_FOUND);
         }
 
         Object documentsObj = kakaoResponse.get("documents");
 
         if (!(documentsObj instanceof List<?> documents) || documents.isEmpty()) {
-            throw new IllegalArgumentException("Kakao API 응답에서 유효한 장소 정보가 없습니다.");
+            throw new CustomException(ErrorCode.INVALID_DATA_TYPE);
         }
 
         return (List<Map<String, Object>>) documents;
@@ -96,7 +98,7 @@ public class PlaceService {
         Object firstItem = documents.get(0);
 
         if (!(firstItem instanceof Map<?, ?> placeData)) {
-            throw new IllegalArgumentException("Kakao API 응답 데이터 구조가 예상과 다릅니다.");
+            throw new CustomException(ErrorCode.INVALID_DATA_TYPE);
         }
 
         return (Map<String, Object>) placeData;
