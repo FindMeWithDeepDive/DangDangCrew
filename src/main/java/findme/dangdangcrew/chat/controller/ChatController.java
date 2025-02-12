@@ -19,50 +19,18 @@ public class ChatController {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final ChatRoomService chatRoomService;
 
-    @MessageMapping("/chat.sendMessage/{roomId}")
-    @SendTo("/subscribe/chatroom/{roomId}")
-    public ChatMessageResponseDto sendMessage(
-            @DestinationVariable Long roomId,
-            @Payload ChatMessageRequestDto chatMessage) {
-
-        return new ChatMessageResponseDto(
-                String.valueOf(roomId),
-                chatMessage.getSender(),
-                chatMessage.getMessage(),
-                LocalDateTime.now().format(formatter)
-        );
-    }
-
-    @MessageMapping("/chat.enterRoom/{roomId}")
-    @SendTo("/subscribe/chatroom/{roomId}")
-    public ChatMessageResponseDto enterRoom(
-            @DestinationVariable Long roomId,
-            @Payload ChatMessageRequestDto chatMessage) {
-
-        chatRoomService.enterRoom(roomId);
-
-        String welcomeMessage = chatMessage.getSender() + "님이 입장하셨습니다.";
-        return new ChatMessageResponseDto(
-                String.valueOf(roomId),
-                "System", // 시스템 메시지
-                welcomeMessage,
-                LocalDateTime.now().format(formatter)
-        );
-    }
-
-    @MessageMapping("/chat.leaveRoom/{roomId}")
-    @SendTo("/subscribe/chatroom/{roomId}")
+    @MessageMapping("/chat.{roomId}")
+    @SendTo("/subscribe/chatroom.{roomId}")
     public ChatMessageResponseDto leaveRoom(
             @DestinationVariable Long roomId,
             @Payload ChatMessageRequestDto chatMessage) {
 
-        chatRoomService.leaveRoom(roomId);
+        String message = chatRoomService.processChat(chatMessage, roomId);
 
-        String leaveMessage = chatMessage.getSender() + "님이 퇴장하셨습니다.";
         return new ChatMessageResponseDto(
                 String.valueOf(roomId),
-                "System",
-                leaveMessage,
+                chatMessage.getSender(),
+                message,
                 LocalDateTime.now().format(formatter)
         );
     }
