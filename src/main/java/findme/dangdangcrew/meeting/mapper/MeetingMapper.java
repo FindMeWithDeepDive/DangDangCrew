@@ -3,6 +3,7 @@ package findme.dangdangcrew.meeting.mapper;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
+import findme.dangdangcrew.place.domain.Place;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
 
@@ -11,12 +12,13 @@ import java.util.List;
 @Builder
 @Component
 public class MeetingMapper {
-    public Meeting toEntity(MeetingRequestDto dto) {
+    public Meeting toEntity(MeetingRequestDto dto, Place place) {
         return Meeting.builder()
                 .meetingName(dto.getMeetingName())
                 .information(dto.getInformation())
                 .maxPeople(dto.getMaxPeople())
                 .curPeople(1)
+                .place(place)
                 .build();
     }
 
