@@ -11,6 +11,7 @@ import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.ApplyEvent;
+import findme.dangdangcrew.notification.event.NewMeetingEvent;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.place.service.PlaceService;
 import findme.dangdangcrew.user.entity.User;
@@ -60,6 +61,7 @@ public class MeetingService {
         Meeting meeting = meetingMapper.toEntity(meetingRequestDto, place);
         meeting = meetingRepository.save(meeting);
         chatRoomService.createChatRoom(meeting);
+        eventPublisher.publisher(new NewMeetingEvent(place.getPlaceName(),meeting.getId(),place.getId()));
 
         User user = userRepository.findById(userId).orElseThrow();
         UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.LEADER);

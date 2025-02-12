@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,9 +61,9 @@ public class SseService {
                             .id(eventId)
                             .reconnectTime(RECONNECTION_TIMEOUT)
                             .data(message, MediaType.APPLICATION_JSON));
-                    log.info("sent notification to userId={}, payload={}", userId, message);
+                    log.info("알림을 전송합니다. userId={}, payload={}", userId, message);
                 } catch (IOException e) {
-                    log.error("fail to send emitter to userId={} - {}", userId, e.getMessage());
+                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
                 }
             }
         });
@@ -70,24 +71,27 @@ public class SseService {
 
     // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
     @Async
-    public void broadcastNewMeeting(Set<Long> connectedUserIds, String message){
-        log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
-        connectedUserIds.forEach(userId -> {
-            SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
-            if (emitter != null) {
+    public void broadcastNewMeeting(Set<Long> userIds, String message){
+        log.info("[broadcastNewMeeting] 실행 쓰레드 : {}",Thread.currentThread().getName());
+        Map<String, SseEmitter> userEmitters = emitterRepository.findEmittersByUserId(userIds);
+        userEmitters.forEach((key, emitter)->{
+            Long userId = null;
+            if(emitter != null){
                 try {
+                    userId = Long.parseLong(key.split("_")[0]);
                     String eventId = generateEventId(userId);
                     emitter.send(SseEmitter.event()
-                            .name("broadcast event")
+                            .name("NewMeeting Event")
                             .id(eventId)
                             .reconnectTime(RECONNECTION_TIMEOUT)
                             .data(message, MediaType.APPLICATION_JSON));
-                    log.info("sent notification to userId={}, payload={}", userId, message);
-                } catch (IOException e) {
-                    log.error("fail to send emitter to userId={} - {}", userId, e.getMessage());
+                    log.info("알림을 전송합니다. userId={} = {}", userId, message);
+                }catch (IOException e){
+                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
                 }
             }
         });
+
     }
 
     // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림

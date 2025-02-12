@@ -27,7 +27,6 @@ public class NotificationEventListener {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final SseService sseService;
 
-// 이건 즐겨찾기 한 유저 전부에게 뿌려야 하므로 즐겨찾기 유저 찾는 다른 로직이 필요
     @EventListener
     public void handleNewMeetingNotification(NewMeetingEvent event) {
         // 보낼 메세지
@@ -36,9 +35,7 @@ public class NotificationEventListener {
         // 생성 시각
         LocalDateTime createdAt = LocalDateTime.now();
 
-        // 미팅이 생성된 장소에 즐겨찾기 한 유저 조회
         // 미팅이 생성된 장소 정보 조회 -> 해당 장소를 즐겨찾기 한 유저 찾기
-        // 즐겨찾기 한 유저들을 찾았으면 해당 유저가 연결이 되어있는지 찾기.
         List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllByPlaceId(event.placeId());
         Set<Long> userIds = favoritePlaces.stream()
                 .map(favoritePlace -> favoritePlace.getUser().getId())
@@ -62,7 +59,6 @@ public class NotificationEventListener {
 
     }
 
-    //이건 연결되어있는 모든 유저한테 보내야 하므로 유저 찾기 로직이 필요
     @EventListener
     public void handleHotPlaceNotification(HotPlaceEvent event) {
         // 보낼 메세지
@@ -90,7 +86,6 @@ public class NotificationEventListener {
         sseService.broadcastHotPlace(connectUserId, message);
     }
 
-    // 이건 타겟이 단 한명이므로 현상 유지 괜찮을 듯
     @EventListener
     public void handleApplyNotification(ApplyEvent event) {
         // 보낼 메세지
