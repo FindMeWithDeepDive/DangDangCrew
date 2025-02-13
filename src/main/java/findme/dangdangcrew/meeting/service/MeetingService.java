@@ -1,13 +1,14 @@
 package findme.dangdangcrew.meeting.service;
 
-import findme.dangdangcrew.chat.entity.ChatRoom;
-import findme.dangdangcrew.chat.repository.ChatRoomRepository;
 import findme.dangdangcrew.chat.service.ChatRoomService;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.global.service.RedisService;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
+import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
@@ -48,8 +49,8 @@ public class MeetingService {
     private final ChatRoomService chatRoomService;
     private final RedisService redisService;
 
-    public Meeting findById(Long id) {
-        return meetingRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
+    public Meeting findProgressMeeting(Long id) {
+        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
     }
 
     /*
@@ -74,7 +75,7 @@ public class MeetingService {
 
     // 모임 상세 조회
     public MeetingDetailResponseDto readByMeetingId(Long id) {
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
         return meetingMapper.toDto(meeting);
     }
 
@@ -86,7 +87,7 @@ public class MeetingService {
     // 모임 참가 신청
     @Transactional
     public MeetingApplicationResponseDto applyMeetingByMeetingId(Long id, Long userId) {
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
         User user = userRepository.findById(userId).orElseThrow();
         Place place = meeting.getPlace();
 
@@ -101,7 +102,7 @@ public class MeetingService {
     // 모임 참가 취소
     @Transactional
     public MeetingApplicationResponseDto cancelMeetingApplication(Long id, Long userId) {
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
         User user = userRepository.findById(userId).orElseThrow();
 
         UserMeeting userMeeting = userMeetingService.cancelMeetingApplication(meeting, user);
@@ -117,7 +118,7 @@ public class MeetingService {
     // 모임 신청 상태 변경(모임 생성자)
     @Transactional
     public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto){
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
         User user = userRepository.findById(dto.getUserId()).orElseThrow();
 
         /*
@@ -143,7 +144,7 @@ public class MeetingService {
 
     // 모임 신청자 조회
     public List<MeetingApplicationResponseDto> readAllApplications(Long id) {
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
 
         /*
          * TODO
@@ -157,7 +158,7 @@ public class MeetingService {
 
     // 모임 확정자 조회
     public List<MeetingApplicationResponseDto> readAllConfirmed(Long id) {
-        Meeting meeting = findById(id);
+        Meeting meeting = findProgressMeeting(id);
 
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
         return meetingMapper.toListApplicationDto(userMeetings);
@@ -165,7 +166,29 @@ public class MeetingService {
 
     // 장소별 모임 조회
     public List<MeetingBasicResponseDto> findMeetingsByPlaceId(String placeId) {
-        List<Meeting> meetings = meetingRepository.findAllByPlace_Id(placeId);
+        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatus(placeId, MeetingStatus.IN_PROGRESS);
         return meetingMapper.toListDto(meetings);
+    }
+
+    // 모임 수정
+    @Transactional
+    public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto){
+        Meeting meeting = findProgressMeeting(id);
+
+        meeting.updateMeeting(
+                meetingRequestDto.getMeetingName(),
+                meetingRequestDto.getInformation(),
+                meetingRequestDto.getMaxPeople()
+        );
+
+        return meetingMapper.toDto(meeting);
+    }
+
+    // 모임 삭제
+    @Transactional
+    public void deleteMeeting(Long id){
+        Meeting meeting = findProgressMeeting(id);
+        meeting.updateMeetingStatus(MeetingStatus.DELETED);
+        userMeetingService.delete(meeting);
     }
 }
