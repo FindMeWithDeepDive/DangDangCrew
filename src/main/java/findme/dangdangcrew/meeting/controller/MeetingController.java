@@ -72,7 +72,7 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{meetingId}/delete")
+    @PatchMapping("/{meetingId}/cancel")
     public ResponseEntity<Void> deleteMeeting(@PathVariable("meetingId") Long meetingId){
         meetingService.deleteMeeting(meetingId);
         return ResponseEntity.ok().build();
