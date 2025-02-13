@@ -3,6 +3,7 @@ package findme.dangdangcrew.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,4 +15,5 @@ public class UserResponseDto {
     private String nickname;
     private String phoneNumber;
     private LocalDateTime createdAt;
+    private BigDecimal userScore;
 }

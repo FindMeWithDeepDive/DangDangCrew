@@ -120,7 +120,8 @@ public class UserService {
                 user.getName(),
                 user.getNickname(),
                 user.getPhoneNumber(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                user.getUserScore()
         );
     }
 }
