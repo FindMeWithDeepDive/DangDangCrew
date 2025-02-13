@@ -4,6 +4,7 @@ import findme.dangdangcrew.global.config.JwtTokenProvider;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    @GetMapping("/me")
+    @Operation(summary = "내 정보 조회", description = "JWT 토큰을 기반으로 본인 정보를 조회합니다.")
+    public ResponseEntity<UserResponseDto> getUserInfo(
+            @RequestHeader(value = "Authorization") String authorizationHeader) {
+
+        String token = jwtTokenProvider.extractToken(authorizationHeader);
+        return ResponseEntity.ok(userService.getUserInfo(token));
+    }
+
 
 }

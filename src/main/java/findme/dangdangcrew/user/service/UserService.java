@@ -105,4 +105,18 @@ public class UserService {
         }
     }
 
+    public UserResponseDto getUserInfo(String token) {
+        String email = jwtTokenProvider.getEmailFromToken(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getNickname(),
+                user.getPhoneNumber(),
+                user.getCreatedAt()
+        );
+    }
 }
