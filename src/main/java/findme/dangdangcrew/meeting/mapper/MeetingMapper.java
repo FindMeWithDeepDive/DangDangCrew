@@ -29,6 +29,7 @@ public class MeetingMapper {
                 .information(meeting.getInformation())
                 .maxPeople(meeting.getMaxPeople())
                 .curPeople(meeting.getCurPeople())
+                .status(meeting.getStatus())
                 .createdAt(meeting.getCreatedAt())
                 .build();
     }
@@ -40,6 +41,7 @@ public class MeetingMapper {
                             .meetingName(meeting.getMeetingName())
                             .maxPeople(meeting.getMaxPeople())
                             .curPeople(meeting.getCurPeople())
+                            .status(meeting.getStatus())
                             .build())
             .toList();
     }
