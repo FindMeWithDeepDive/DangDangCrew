@@ -2,6 +2,7 @@ package findme.dangdangcrew.global.config;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -73,6 +74,14 @@ public class JwtTokenProvider {
             throw new RuntimeException("Missing or invalid Authorization header");
         }
         return authorizationHeader.substring(7).trim();
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+        }
+        return null;
     }
 
 }
