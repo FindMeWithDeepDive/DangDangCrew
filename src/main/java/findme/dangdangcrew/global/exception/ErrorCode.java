@@ -33,6 +33,10 @@ public enum ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "요청한 JSON 형식이 올바르지 않습니다."),
 
+    // JWT Token Error
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    MISSING_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 누락되었습니다."),
     ;
 
     private final HttpStatus status;

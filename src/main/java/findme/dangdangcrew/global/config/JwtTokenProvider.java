@@ -1,7 +1,10 @@
 package findme.dangdangcrew.global.config;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -48,12 +51,16 @@ public class JwtTokenProvider {
     }
 
     public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token.trim())
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token.trim())
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException e) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
     }
 
     public boolean validateToken(String token) {
@@ -61,18 +68,25 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token");
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException e) {
-            log.error("Invalid JWT token");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
-        return false;
     }
 
     public String extractToken(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Missing or invalid Authorization header");
+            throw new CustomException(ErrorCode.MISSING_TOKEN);
         }
         return authorizationHeader.substring(7).trim();
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+        }
+        return null;
     }
 
 }
