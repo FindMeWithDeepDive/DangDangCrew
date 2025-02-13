@@ -65,4 +65,16 @@ public class MeetingController {
         List<MeetingBasicResponseDto> response = meetingService.findMeetingsByPlaceId(placeId);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{meetingId}")
+    public ResponseEntity<MeetingDetailResponseDto> updateMeeting(@PathVariable("meetingId") Long meetingId, @RequestBody MeetingRequestDto dto){
+        MeetingDetailResponseDto response = meetingService.updateMeeting(meetingId, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{meetingId}/cancel")
+    public ResponseEntity<Void> deleteMeeting(@PathVariable("meetingId") Long meetingId){
+        meetingService.deleteMeeting(meetingId);
+        return ResponseEntity.ok().build();
+    }
 }

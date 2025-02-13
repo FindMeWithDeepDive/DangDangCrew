@@ -51,7 +51,7 @@ public class FavoritePlaceService {
 
     public List<FavoritePlaceResponseDto> getAllFavoritePlace(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllWithPlaceByUser(user);
+        List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllByUser(user);
 
         return favoritePlaces.stream()
                 .map(favoritePlace -> FavoritePlaceResponseDto.of(favoritePlace.getPlace(),user.getId()))

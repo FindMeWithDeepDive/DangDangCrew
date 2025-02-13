@@ -34,7 +34,7 @@ public class EventTestController {
 
     @GetMapping("/new-meeting")
     public String testNewMeetingApi(){
-        eventPublisher.publisher(new NewMeetingEvent("강남역 카페",1L));
+        eventPublisher.publisher(new NewMeetingEvent("강남역 카페",1L,"12345"));
 
         return "ok";
     }

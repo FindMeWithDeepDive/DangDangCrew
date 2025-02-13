@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -25,15 +26,17 @@ public class SseEmitterRepository implements EmitterRepository{
 
     @Override
     public Map<String, SseEmitter> findAllEmittersStartWithUserId(Long userId) {
+        String userIdPrefix = userId +"_";
         return emitters.entrySet().stream()
-                .filter(e -> e.getKey().startsWith(userId.toString()))
+                .filter(e -> e.getKey().startsWith(userIdPrefix))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public Map<String, Object> findAllEventsStartWithUserId(Long userId) {
+        String userIdPrefix = userId +"_";
         return events.entrySet().stream()
-                .filter(e->e.getKey().startsWith(userId.toString()))
+                .filter(e->e.getKey().startsWith(userIdPrefix))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -44,15 +47,17 @@ public class SseEmitterRepository implements EmitterRepository{
 
     @Override
     public void deleteAllEmittersStartWithUserId(Long userId) {
+        String userIdPrefix = userId +"_";
         emitters.forEach((k,v) -> {
-            if(k.startsWith(userId.toString())) events.remove(k);
+            if(k.startsWith(userIdPrefix)) events.remove(k);
         });
     }
 
     @Override
     public void deleteAllEventsStartWithUserId(Long userId) {
+        String userIdPrefix = userId +"_";
         events.forEach((k,v) ->{
-            if(k.startsWith(userId.toString())) events.remove(k);
+            if(k.startsWith(userIdPrefix)) events.remove(k);
         });
     }
 
@@ -64,9 +69,19 @@ public class SseEmitterRepository implements EmitterRepository{
     @Override
     public SseEmitter findEmitterByUserId(Long userId) {
         return emitters.entrySet().stream()
-                .filter(e -> e.getKey().toString().startsWith(userId.toString()))  // userId로 시작하는 키 필터링
+                .filter(e -> e.getKey().toString().startsWith(userId+"_"))  // userId로 시작하는 키 필터링
                 .map(Map.Entry::getValue)  // Map.Entry에서 SseEmitter 값을 추출
                 .findFirst()  // 첫 번째 결과를 찾음
                 .orElse(null);  // 없을 경우 null 반환
+    }
+
+    @Override
+    public Map<String, SseEmitter> findEmittersByUserId(Set<Long> userIds) {
+        return emitters.entrySet().stream()
+                .filter(entry -> {
+                    String key = entry.getKey();
+                    return userIds.stream().anyMatch(id -> key.startsWith(id + "_"));
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

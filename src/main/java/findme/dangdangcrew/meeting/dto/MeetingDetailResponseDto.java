@@ -1,5 +1,6 @@
 package findme.dangdangcrew.meeting.dto;
 
+import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,6 +18,8 @@ public class MeetingDetailResponseDto {
     private Integer maxPeople;
 
     private Integer curPeople;
+
+    private MeetingStatus status;
 
     private LocalDateTime createdAt;
 }
