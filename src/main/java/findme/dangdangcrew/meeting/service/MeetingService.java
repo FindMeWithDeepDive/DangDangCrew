@@ -4,6 +4,7 @@ import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.publisher.EventPublisher;
+import findme.dangdangcrew.global.service.RedisService;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
@@ -14,10 +15,12 @@ import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.ApplyEvent;
 import findme.dangdangcrew.notification.event.NewMeetingEvent;
 import findme.dangdangcrew.place.domain.Place;
+import findme.dangdangcrew.place.service.HotPlaceService;
 import findme.dangdangcrew.place.service.PlaceService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +40,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MeetingService {
-
     private final MeetingRepository meetingRepository;
     private final MeetingMapper meetingMapper;
     private final UserMeetingService userMeetingService;
@@ -45,6 +47,7 @@ public class MeetingService {
     private final EventPublisher eventPublisher;
     private final PlaceService placeService;
     private final ChatRoomService chatRoomService;
+    private final RedisService redisService;
 
     public Meeting findProgressMeeting(Long id) {
         return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
@@ -86,11 +89,13 @@ public class MeetingService {
     public MeetingApplicationResponseDto applyMeetingByMeetingId(Long id, Long userId) {
         Meeting meeting = findProgressMeeting(id);
         User user = userRepository.findById(userId).orElseThrow();
+        Place place = meeting.getPlace();
+
         UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.WAITING);
         User leader = userMeetingService.findLeader(meeting);
 
         eventPublisher.publisher(new ApplyEvent(leader.getId(), user.getNickname(), user.getId(), meeting.getId(), meeting.getMeetingName()));
-
+        redisService.incrementHotPlace(place.getId());
         return meetingMapper.toApplicationDto(userMeeting);
     }
 

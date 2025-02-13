@@ -21,7 +21,7 @@ public class ChatController {
 
     @MessageMapping("/chat.{roomId}")
     @SendTo("/subscribe/chatroom.{roomId}")
-    public ChatMessageResponseDto leaveRoom(
+    public ChatMessageResponseDto handleChat(
             @DestinationVariable Long roomId,
             @Payload ChatMessageRequestDto chatMessage) {
 

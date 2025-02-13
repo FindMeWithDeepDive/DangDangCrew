@@ -1,6 +1,7 @@
 package findme.dangdangcrew.user.service;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
+import findme.dangdangcrew.global.service.RedisService;
 import findme.dangdangcrew.user.controller.UserController;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.entity.User;
@@ -12,11 +13,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final StringRedisTemplate redisTemplate;
+    //private final StringRedisTemplate redisTemplate;
+    private final RedisService redisService;
+
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
@@ -72,7 +74,8 @@ public class UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
+        //redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
+        redisService.saveRefreshToken(user.getEmail(), refreshToken);
 
         return new TokenResponseDto(accessToken, refreshToken);
     }
@@ -84,7 +87,9 @@ public class UserService {
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
 
         // 2.Redis에 저장된 Refresh Token과 비교
-        String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
+        //String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
+        String storedRefreshToken = redisService.getRefreshToken(email);
+
         if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
             throw new RuntimeException("Invalid or expired refresh token. Please log in again.");
         }
@@ -97,7 +102,7 @@ public class UserService {
 
     public void logout() {
         User user = getCurrentUser();
-        redisTemplate.delete("refresh:" + user.getEmail());
+        redisService.deleteRefreshToken(user.getEmail());
     }
 
     public UserResponseDto getUserInfo() {

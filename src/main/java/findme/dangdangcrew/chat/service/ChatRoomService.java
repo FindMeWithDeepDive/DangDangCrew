@@ -1,6 +1,7 @@
 package findme.dangdangcrew.chat.service;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
+import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
 import findme.dangdangcrew.meeting.entity.Meeting;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageService chatMessageService;
 
     public String processChat(ChatMessageRequestDto chatMessage, Long roomId) {
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.ENTER) {
@@ -24,6 +26,7 @@ public class ChatRoomService {
             leaveRoom(roomId);
             return chatMessage.getSender() + "님이 퇴장하셨습니다.";
         }
+        chatMessageService.saveMessage(chatMessage, roomId);
         return chatMessage.getMessage();
     }
 
