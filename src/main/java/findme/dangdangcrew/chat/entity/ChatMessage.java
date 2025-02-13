@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Builder
 @Document(collection = "chat_message")
-public class Message {
+public class ChatMessage {
 
     @Id
     private String id;
@@ -24,8 +24,8 @@ public class Message {
     private String message;
     private LocalDateTime time;
 
-    public static Message create(Long roomId, String sender, String message) {
-        return Message.builder()
+    public static ChatMessage create(Long roomId, String sender, String message) {
+        return ChatMessage.builder()
             .roomId(roomId)
             .sender(sender)
             .message(message)
