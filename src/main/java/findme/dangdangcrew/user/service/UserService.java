@@ -1,6 +1,8 @@
 package findme.dangdangcrew.user.service;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.service.RedisService;
 import findme.dangdangcrew.user.controller.UserController;
 import findme.dangdangcrew.user.dto.*;
@@ -138,5 +140,19 @@ public class UserService {
         UserDetails userDetails = (UserDetails) principal;
         return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequestDto request) {
+        User user = getCurrentUser(); // 현재 로그인한 사용자 정보 가져오기
+
+        // 현재 비밀번호 검증
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PARAMETER);
+        }
+
+        // 새로운 비밀번호 암호화 후 저장
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }
