@@ -55,7 +55,7 @@ public class UserService {
                 .build();
         userRepository.save(user);
 
-        return new UserResponseDto(user.getId(), user.getEmail(), user.getName(), user.getNickname(), user.getPhoneNumber(), user.getCreatedAt());
+        return convertToDto(user);
     }
 
     public TokenResponseDto authenticate(LoginRequestDto request) {
@@ -105,4 +105,23 @@ public class UserService {
         }
     }
 
+    public UserResponseDto getUserInfo(String token) {
+        String email = jwtTokenProvider.getEmailFromToken(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        return convertToDto(user);
+    }
+
+    private UserResponseDto convertToDto(User user) {
+        return new UserResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getNickname(),
+                user.getPhoneNumber(),
+                user.getCreatedAt(),
+                user.getUserScore()
+        );
+    }
 }
