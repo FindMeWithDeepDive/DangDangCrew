@@ -2,6 +2,7 @@ package findme.dangdangcrew.chat.service;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
+import findme.dangdangcrew.chat.entity.ChatParticipant;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatParticipantRepository;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
@@ -42,6 +43,7 @@ public class ChatRoomService {
         User user = userService.getUser(userId);
         checkIfAlreadyJoined(chatRoom, user);
 
+        saveChatParticipant(chatRoom, user);
         chatRoom.addParticipant();
     }
 
@@ -73,5 +75,13 @@ public class ChatRoomService {
 
     public void createChatRoom(Meeting meeting) {
         chatRoomRepository.save(new ChatRoom(meeting));
+    }
+
+    private void saveChatParticipant(ChatRoom chatRoom, User user) {
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatRoom(chatRoom)
+                .user(user)
+                .build();
+        chatParticipantRepository.save(chatParticipant);
     }
 }

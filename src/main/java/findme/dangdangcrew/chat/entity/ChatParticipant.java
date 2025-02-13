@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
 @Table(name = "chat_participant", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"room_id", "user_id"})
@@ -37,4 +36,10 @@ public class ChatParticipant {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Builder
+    public ChatParticipant(ChatRoom chatRoom, User user) {
+        this.chatRoom = chatRoom;
+        this.user = user;
+    }
 }
