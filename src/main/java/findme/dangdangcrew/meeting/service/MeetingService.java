@@ -1,6 +1,8 @@
 package findme.dangdangcrew.meeting.service;
 
 import findme.dangdangcrew.chat.service.ChatRoomService;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
@@ -45,7 +47,7 @@ public class MeetingService {
     private final ChatRoomService chatRoomService;
 
     public Meeting findProgressMeeting(Long id) {
-        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
+        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
     }
 
     /*
