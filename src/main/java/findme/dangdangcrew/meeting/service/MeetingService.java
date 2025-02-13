@@ -5,6 +5,7 @@ import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
+import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
@@ -44,7 +45,7 @@ public class MeetingService {
     private final ChatRoomService chatRoomService;
 
     public Meeting findById(Long id) {
-        return meetingRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
+        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new IllegalArgumentException("해당 미팅이 존재하지 않습니다."));
     }
 
     /*
@@ -83,7 +84,6 @@ public class MeetingService {
     public MeetingApplicationResponseDto applyMeetingByMeetingId(Long id, Long userId) {
         Meeting meeting = findById(id);
         User user = userRepository.findById(userId).orElseThrow();
-
         UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.WAITING);
         User leader = userMeetingService.findLeader(meeting);
 
@@ -159,7 +159,7 @@ public class MeetingService {
 
     // 장소별 모임 조회
     public List<MeetingBasicResponseDto> findMeetingsByPlaceId(String placeId) {
-        List<Meeting> meetings = meetingRepository.findAllByPlace_Id(placeId);
+        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatus(placeId, MeetingStatus.IN_PROGRESS);
         return meetingMapper.toListDto(meetings);
     }
 
@@ -179,6 +179,7 @@ public class MeetingService {
     // 모임 삭제
     public void deleteMeeting(Long id){
         Meeting meeting = findById(id);
-        meetingRepository.delete(meeting);
+        meeting.updateMeetingStatus(MeetingStatus.DELETED);
+        userMeetingService.delete(meeting);
     }
 }
