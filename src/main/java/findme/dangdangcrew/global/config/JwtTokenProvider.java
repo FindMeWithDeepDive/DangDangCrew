@@ -67,4 +67,12 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
+    public String extractToken(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        return authorizationHeader.substring(7).trim();
+    }
+
 }

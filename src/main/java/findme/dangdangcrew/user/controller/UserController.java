@@ -1,5 +1,6 @@
 package findme.dangdangcrew.user.controller;
 
+import findme.dangdangcrew.global.config.JwtTokenProvider;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class); // ✅ Logger 선언 추가
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "유저를 등록합니다.")
@@ -45,16 +47,14 @@ public class UserController {
     @Operation(summary = "로그아웃", description = "로그아웃을 수행하고 Refresh Token을 삭제합니다.")
     public ResponseEntity<Void> logout(@RequestHeader(value = "authorization", required = false) String token) {
         logger.info("🚀 Received Authorization Header: {}", token);
-
-        if (token == null || !token.startsWith("Bearer ")) {
-            logger.error("❌ Missing or invalid Authorization header");
+        try {
+            String accessToken = jwtTokenProvider.extractToken(token);
+            userService.logout(accessToken);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            logger.error("❌ {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        String accessToken = token.substring(7).trim();
-        userService.logout(accessToken);
-        return ResponseEntity.noContent().build();
     }
-
 
 }
