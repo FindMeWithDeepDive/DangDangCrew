@@ -76,6 +76,6 @@ public class UserMeetingService {
     @Transactional
     public void delete(Meeting meeting) {
         List<UserMeeting> userMeetings = userMeetingRepository.findAllByMeeting_Id(meeting.getId());
-        userMeetings.forEach(userMeeting -> userMeeting.updateStatus(UserMeetingStatus.MEETING_DELETED));
+        userMeetings.forEach(userMeeting -> userMeeting.updateStatus(UserMeetingStatus.REMOVED));
     }
 }
