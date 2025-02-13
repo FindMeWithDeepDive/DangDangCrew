@@ -1,5 +1,7 @@
 package findme.dangdangcrew.chat.entity;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.user.entity.User;
 import jakarta.persistence.Entity;
@@ -36,12 +38,11 @@ public class ChatRoom {
         this.currentParticipants = 1; // 방장이 자동으로 입장
     }
 
-    public boolean addParticipant() {
-        if (currentParticipants < MAX_PARTICIPANTS) {
-            currentParticipants++;
-            return true;
+    public void addParticipant() {
+        if (currentParticipants >= MAX_PARTICIPANTS) {
+            throw new CustomException(ErrorCode.CHAT_ROOM_FULL);
         }
-        return false;
+        currentParticipants++;
     }
 
     public void removeParticipant() {

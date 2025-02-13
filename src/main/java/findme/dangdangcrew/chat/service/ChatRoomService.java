@@ -42,9 +42,7 @@ public class ChatRoomService {
         User user = userService.getUser(userId);
         checkIfAlreadyJoined(chatRoom, user);
 
-        if (!chatRoom.addParticipant()) {
-            throw new CustomException(ErrorCode.CHAT_ROOM_FULL);
-        }
+        chatRoom.addParticipant();
     }
 
     public void leaveRoom(Long roomId, Long userId) {
