@@ -164,6 +164,7 @@ public class MeetingService {
     }
 
     // 모임 수정
+    @Transactional
     public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto){
         Meeting meeting = findById(id);
 
@@ -177,6 +178,7 @@ public class MeetingService {
     }
 
     // 모임 삭제
+    @Transactional
     public void deleteMeeting(Long id){
         Meeting meeting = findById(id);
         meeting.updateMeetingStatus(MeetingStatus.DELETED);

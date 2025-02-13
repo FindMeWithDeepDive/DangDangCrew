@@ -73,6 +73,7 @@ public class UserMeetingService {
     }
 
     // 모임 삭제시 연관관계 삭제
+    @Transactional
     public void delete(Meeting meeting) {
         List<UserMeeting> userMeetings = userMeetingRepository.findAllByMeeting_Id(meeting.getId());
         userMeetings.forEach(userMeeting -> userMeeting.updateStatus(UserMeetingStatus.MEETING_DELETED));
