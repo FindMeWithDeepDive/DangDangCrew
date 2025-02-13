@@ -1,7 +1,5 @@
 package findme.dangdangcrew.meeting.service;
 
-import findme.dangdangcrew.chat.entity.ChatRoom;
-import findme.dangdangcrew.chat.repository.ChatRoomRepository;
 import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.*;
