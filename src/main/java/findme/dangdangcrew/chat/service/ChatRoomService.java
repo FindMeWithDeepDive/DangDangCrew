@@ -52,6 +52,7 @@ public class ChatRoomService {
         User user = userService.getUser(userId);
         checkIfAlreadyLeft(chatRoom, user);
 
+        chatParticipantRepository.deleteByChatRoomAndUser(chatRoom, user);
         chatRoom.removeParticipant();
     }
 
