@@ -162,4 +162,19 @@ public class MeetingService {
         List<Meeting> meetings = meetingRepository.findAllByPlace_Id(placeId);
         return meetingMapper.toListDto(meetings);
     }
+
+    // 모임 수정
+    public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto){
+        Meeting meeting = findById(id);
+
+        meeting.updateMeeting(
+                meetingRequestDto.getMeetingName(),
+                meetingRequestDto.getInformation(),
+                meetingRequestDto.getMaxPeople()
+        );
+
+        return meetingMapper.toDto(meeting);
+    }
+
+    // 모임 삭제
 }

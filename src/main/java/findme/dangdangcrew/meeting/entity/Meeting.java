@@ -53,4 +53,10 @@ public class Meeting {
             throw new IllegalArgumentException("현재 인원은 1명 미만이 될 수 없습니다.");
         }
     }
+
+    public void updateMeeting(String meetingName, String information, Integer maxPeople) {
+        this.meetingName = meetingName;
+        this.information = information;
+        this.maxPeople = maxPeople;
+    }
 }
