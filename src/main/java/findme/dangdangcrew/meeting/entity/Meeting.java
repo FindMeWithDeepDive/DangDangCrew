@@ -43,6 +43,13 @@ public class Meeting {
     @ManyToOne(fetch = FetchType.LAZY)
     private Place place;
 
+    @PrePersist // 엔티티 저장 전 기본값 설정
+    protected void onCreate() {
+        if(this.status == null){
+            this.status = MeetingStatus.IN_PROGRESS;
+        }
+    }
+
     public void increaseCurPeople() {
         if(this.curPeople <= maxPeople) {
             this.curPeople++;
