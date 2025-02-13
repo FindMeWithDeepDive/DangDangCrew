@@ -1,6 +1,8 @@
 package findme.dangdangcrew.user.service;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.user.controller.UserController;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.entity.User;
@@ -123,5 +125,10 @@ public class UserService {
                 user.getCreatedAt(),
                 user.getUserScore()
         );
+    }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }
