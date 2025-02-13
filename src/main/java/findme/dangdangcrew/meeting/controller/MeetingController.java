@@ -72,9 +72,9 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{meetingId}")
+    @PutMapping("/{meetingId}/delete")
     public ResponseEntity<Void> deleteMeeting(@PathVariable("meetingId") Long meetingId){
         meetingService.deleteMeeting(meetingId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
