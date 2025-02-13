@@ -177,4 +177,8 @@ public class MeetingService {
     }
 
     // 모임 삭제
+    public void deleteMeeting(Long id){
+        Meeting meeting = findById(id);
+        meetingRepository.delete(meeting);
+    }
 }
