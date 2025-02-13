@@ -34,6 +34,7 @@ public enum ErrorCode {
     CHAT_ROOM_FULL(HttpStatus.BAD_REQUEST, "채팅방이 가득 찼습니다. (최대 20명)"),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
     ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 채팅방에 참여한 사용자입니다."),
+    ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 채팅방을 나간 사용자입니다."),
     ;
 
     private final HttpStatus status;

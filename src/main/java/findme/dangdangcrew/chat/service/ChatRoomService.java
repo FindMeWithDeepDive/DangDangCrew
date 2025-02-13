@@ -30,7 +30,7 @@ public class ChatRoomService {
             return chatMessage.getSender() + "님이 입장하셨습니다.";
         }
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.LEAVE) {
-            leaveRoom(roomId);
+            leaveRoom(roomId, userId);
             return chatMessage.getSender() + "님이 퇴장하셨습니다.";
         }
         chatMessageService.saveMessage(chatMessage, roomId);
@@ -47,8 +47,11 @@ public class ChatRoomService {
         }
     }
 
-    public void leaveRoom(Long roomId) {
+    public void leaveRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = getChatRoom(roomId);
+        User user = userService.getUser(userId);
+        checkIfAlreadyLeft(chatRoom, user);
+
         chatRoom.removeParticipant();
     }
 
@@ -61,6 +64,12 @@ public class ChatRoomService {
     public void checkIfAlreadyJoined(ChatRoom chatRoom, User user) {
         if (chatParticipantRepository.findByChatRoomAndUser(chatRoom, user).isPresent()) {
             throw new CustomException(ErrorCode.ALREADY_JOINED);
+        }
+    }
+
+    public void checkIfAlreadyLeft(ChatRoom chatRoom, User user) {
+        if (chatParticipantRepository.findByChatRoomAndUser(chatRoom, user).isEmpty()) {
+            throw new CustomException(ErrorCode.ALREADY_LEFT);
         }
     }
 
