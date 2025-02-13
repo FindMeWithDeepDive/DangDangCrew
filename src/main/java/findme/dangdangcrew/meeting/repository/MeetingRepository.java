@@ -1,10 +1,13 @@
 package findme.dangdangcrew.meeting.repository;
 
 import findme.dangdangcrew.meeting.entity.Meeting;
+import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-    List<Meeting> findAllByPlace_Id(String placeId);
+    List<Meeting> findAllByPlace_IdAndStatus(String placeId, MeetingStatus status);
+    Optional<Meeting> findByIdAndStatus(Long id, MeetingStatus status);
 }
