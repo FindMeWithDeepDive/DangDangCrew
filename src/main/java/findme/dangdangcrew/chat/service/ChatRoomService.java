@@ -4,6 +4,8 @@ import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,7 @@ public class ChatRoomService {
     public void enterRoom(Long roomId) {
         ChatRoom chatRoom = getChatRoom(roomId);
         if (!chatRoom.addParticipant()) {
-            throw new IllegalStateException("채팅방이 가득 찼습니다. (최대 20명)");
+            throw new CustomException(ErrorCode.CHAT_ROOM_FULL);
         }
     }
 
@@ -44,7 +46,7 @@ public class ChatRoomService {
 
     private ChatRoom getChatRoom(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         return chatRoom;
     }
 
