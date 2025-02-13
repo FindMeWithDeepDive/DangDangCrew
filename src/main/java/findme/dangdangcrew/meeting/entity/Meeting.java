@@ -1,5 +1,6 @@
 package findme.dangdangcrew.meeting.entity;
 
+import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.place.domain.Place;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,10 @@ public class Meeting {
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private Integer curPeople = 1;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MeetingStatus status;
 
     @CreatedDate
     private LocalDateTime createdAt;
