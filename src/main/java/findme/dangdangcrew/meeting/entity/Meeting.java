@@ -64,4 +64,8 @@ public class Meeting {
         this.information = information;
         this.maxPeople = maxPeople;
     }
+
+    public void updateMeetingStatus(MeetingStatus status) {
+        this.status = status;
+    }
 }
