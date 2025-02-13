@@ -32,7 +32,7 @@ public class SseService {
     }
     
     public SseEmitter subscribe(Long userId){
-        // 여러개의 SseEmitter를 관리하기 위해, 중복되지 않은 key값을 생성.
+        // 여러개의 SseEmitter를 관리하기 위해, 중복되지 않은 key 값을 생성.
         // 이를 통해 데이터 복구, 덮어쓰기 방지를 할 수 있다.
         String eventId = generateEventId(userId);
 
@@ -42,8 +42,6 @@ public class SseService {
 
         sendToClient(eventId, sseEmitter,"알림 구독 성공 [userId = " + userId +"]");
 
-        // recover 해야하는 상황은 어떤 상황일까?
-        //recoverData(userId, lastEventId, sseEmitter);
         return sseEmitter;
     }
 
@@ -104,7 +102,7 @@ public class SseService {
                         .name("apply-notification")
                         .data(message));
             }catch (IOException e){
-                emitterRepository.deleteAllEmittersStartWithUserId(userId);
+                emitterRepository.deleteAllEmittersByUserId(userId);
             }
         }
     }
@@ -164,39 +162,4 @@ public class SseService {
         return userId + "_" + clockHolder.mills();
     }
 
-
-    /** recover 관련 로직 **/
-//    private long extractTimestamp(String eventId) {
-//        try {
-//            return Long.parseLong(eventId.split("_")[1]); // "1_1739162204899" → 1739162204899 변환
-//        } catch (Exception ex) {
-//            log.error("Invalid eventId format: {}", eventId);
-//            return Long.MIN_VALUE;
-//        }
-//    }
-
-    // 당장 recover해야하는 내용이 필요하진 않을 듯 함.
-//    private void recoverData(Long userId, String lastEventId, SseEmitter sseEmitter){
-//        log.info("[recoverData] lastEventId 상태 확인 : {}", lastEventId);
-//        if(lastEventId != null && !lastEventId.trim().isEmpty()){
-//            Map<String,Object> events = emitterRepository.findAllEventStartWithUserId(userId);
-//            log.info("--------------------- 해당 유저에 존재하는 event들 ------------------ ");
-//            for(String eventId : events.keySet()){
-//                log.info(userId + " 번 유저에 저장되어있는 eventId : {}", eventId);
-//            }
-//            log.info("------------------------------------------------------------------");
-//
-//            events.entrySet().stream()
-//                    .filter(e ->  extractTimestamp(lastEventId) < extractTimestamp(e.getKey())) // lastEventId가 e.getKey()보다 작다.
-//                    .forEach(e ->{
-//                        try{
-//                            log.info("recover 된 이벤트 id : {}",e.getKey());
-//                            sendToClient(e.getKey(), sseEmitter, e.getValue());
-//                        }catch (Exception ex){
-//                            log.error("Failed to send event: id={}, error={}", e.getKey(), ex.getMessage());
-//
-//                        }
-//                    });
-//        }
-//    }
 }

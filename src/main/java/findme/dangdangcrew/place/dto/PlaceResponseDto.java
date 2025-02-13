@@ -34,7 +34,7 @@ public record PlaceResponseDto(
         );
     }
 
-    // ✅ DTO → Entity 변환 (DB 저장용)
+    // DTO → Entity 변환 (DB 저장용)
     public Place toEntity() {
         return Place.builder()
                 .id(this.id)

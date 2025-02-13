@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class HotPlaceService {
     private static final int HOTPLACE_THRESHOLD = 3;
-
-
     private final EventPublisher eventPublisher;
     private final PlaceService placeService;
     private final RedisService redisService;
@@ -46,7 +44,6 @@ public class HotPlaceService {
             }
         }
     }
-
 
     // 핫 플레이스 알림 전송
     private void sendHotPlaceNotification(String placeId){

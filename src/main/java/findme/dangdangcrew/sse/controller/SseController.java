@@ -25,11 +25,4 @@ public class SseController {
         log.info("userId: {}", userId);
         return sseService.subscribe(userId);
     }
-
-//    @PostMapping("/broadcast")
-//    public ResponseEntity<?> broadcast(@RequestBody EventPayload eventPayload){
-//        sseService.broadcast(eventPayload);
-//        return ResponseEntity.ok().build();
-//    }
-
 }
