@@ -20,6 +20,7 @@ public class NewMeetingNotificationConverter implements NotificationConverter{
                 notificationEntity.getMessage(),
                 notificationEntity.isRead(),
                 notificationEntity.getMeetingId(),
+                notificationEntity.getPlaceId(),
                 notificationEntity.getCreatedAt());
     }
 

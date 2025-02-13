@@ -5,6 +5,7 @@ package findme.dangdangcrew.notification.event;
  */
 public record NewMeetingEvent(
         String placeName,
-        Long meetingId
+        Long meetingId,
+        String placeId
 ) {
 }
