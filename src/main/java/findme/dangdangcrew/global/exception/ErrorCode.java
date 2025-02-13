@@ -10,6 +10,9 @@ public enum ErrorCode {
     // User Error
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
 
+    // Place Error
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
+
     // FavoritePlace Error
     ALREADY_FAVORITE_PLACE(HttpStatus.BAD_REQUEST, "이미 즐겨찾기한 장소입니다."),
 
