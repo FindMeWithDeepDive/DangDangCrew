@@ -39,7 +39,7 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{meetingId}/apply")
+    @PatchMapping("/{meetingId}/cancel")
     @Operation(summary = "모임 참가 취소", description = "유저가 모임 참가를 취소합니다.")
     public ResponseEntity<MeetingApplicationResponseDto> cancelMeetingApplication(@PathVariable("meetingId") Long meetingId){
         MeetingApplicationResponseDto response = meetingService.cancelMeetingApplication(meetingId);
