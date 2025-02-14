@@ -33,10 +33,17 @@ public enum ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "요청한 JSON 형식이 올바르지 않습니다."),
 
+    // Chat Error
+    CHAT_ROOM_FULL(HttpStatus.BAD_REQUEST, "채팅방이 가득 찼습니다. (최대 20명)"),
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
+    ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 채팅방에 참여한 사용자입니다."),
+    ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 채팅방을 나간 사용자입니다."),
+
     // JWT Token Error
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     MISSING_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 누락되었습니다."),
+
     ;
 
     private final HttpStatus status;
