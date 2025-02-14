@@ -146,4 +146,17 @@ public class UserService {
         return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequestDto request) {
+        User user = getCurrentUser(); // 현재 로그인한 사용자 정보 가져오기
+
+        // 현재 비밀번호 검증
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PARAMETER);
+        }
+
+        // 새로운 비밀번호 암호화 후 저장
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+    }
 }
