@@ -85,11 +85,6 @@ public class MeetingService {
 
         UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
 
-        /*
-         * TODO
-         *  when : 유저 도메인에 평가점수 추가 + 평가 도메인 작성된 후
-         *  what : 확정 후 취소했을 경우 평가 점수 감점
-         * */
         updateStatus(meeting);
 
         return meetingMapper.toApplicationDto(userMeeting);
@@ -99,7 +94,6 @@ public class MeetingService {
     @Transactional
     public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto) {
         Meeting meeting = findProgressMeeting(id);
-        User user = userService.getCurrentUser();
 
         UserMeeting userMeeting = userMeetingService.checkLeaderPermission(meeting);
         UserMeetingStatus currentStatus = userMeeting.getStatus();
