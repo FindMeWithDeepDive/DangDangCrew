@@ -11,7 +11,6 @@ import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,17 +35,22 @@ public class UserService {
     public UserResponseDto registerUser(UserRequestDto userRequestDto) {
         // 이메일 중복 검사
         if (userRepository.existsByEmail(userRequestDto.getEmail())) {
-            throw new IllegalArgumentException("Email address already in use");
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
         // 닉네임 중복 검사
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
-            throw new IllegalArgumentException("Nickname already in use");
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_IN_USE);
         }
 
         // 전화번호 중복 검사
         if (userRepository.existsByPhoneNumber(userRequestDto.getPhoneNumber())) {
-            throw new IllegalArgumentException("Phone number already in use");
+            throw new CustomException(ErrorCode.PHONE_NUMBER_ALREADY_IN_USE);
+        }
+
+        // 비밀번호 길이 검사 (6자리 이상)
+        if (userRequestDto.getPassword().length() < 6) {
+            throw new CustomException(ErrorCode.WEAK_PASSWORD);
         }
 
         // 비밀번호 암호화
@@ -67,16 +71,15 @@ public class UserService {
 
     public TokenResponseDto authenticate(LoginRequestDto request) {
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        //redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
         redisService.saveRefreshToken(user.getEmail(), refreshToken);
 
         return new TokenResponseDto(accessToken, refreshToken);
@@ -89,11 +92,14 @@ public class UserService {
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
 
         // 2.Redis에 저장된 Refresh Token과 비교
-        //String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
         String storedRefreshToken = redisService.getRefreshToken(email);
 
-        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-            throw new RuntimeException("Invalid or expired refresh token. Please log in again.");
+        if (storedRefreshToken == null) {
+            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        if (!storedRefreshToken.equals(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         // 3.새로운 Access Token 발급
@@ -133,18 +139,18 @@ public class UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User is not authenticated");
+            throw new CustomException(ErrorCode.MISSING_TOKEN);
         }
 
         Object principal = authentication.getPrincipal();
 
         if (!(principal instanceof UserDetails)) {
-            throw new RuntimeException("Authentication principal is not UserDetails type");
+            throw new CustomException(ErrorCode.INVALID_AUTHENTICATION);
         }
 
         UserDetails userDetails = (UserDetails) principal;
         return userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Transactional
@@ -153,7 +159,7 @@ public class UserService {
 
         // 현재 비밀번호 검증
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PARAMETER);
+            throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
 
         // 새로운 비밀번호 암호화 후 저장
