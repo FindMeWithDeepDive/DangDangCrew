@@ -23,7 +23,6 @@ public class SseService {
     private static final long TIMEOUT = 120*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
-
     // 알림을 저장하기 위한 연결된 userId 가져오는 로직
     public Set<Long> getConnectedUserIds(){
         return emitterRepository.findAllEmitters().keySet().stream()
