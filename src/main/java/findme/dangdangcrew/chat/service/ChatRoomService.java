@@ -2,9 +2,15 @@ package findme.dangdangcrew.chat.service;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
+import findme.dangdangcrew.chat.entity.ChatParticipant;
 import findme.dangdangcrew.chat.entity.ChatRoom;
+import findme.dangdangcrew.chat.repository.ChatParticipantRepository;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
+import findme.dangdangcrew.user.entity.User;
+import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,39 +22,67 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageService chatMessageService;
+    private final UserService userService;
+    private final ChatParticipantRepository chatParticipantRepository;
 
-    public String processChat(ChatMessageRequestDto chatMessage, Long roomId) {
+    public String processChat(ChatMessageRequestDto chatMessage, Long roomId, Long userId) {
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.ENTER) {
-            enterRoom(roomId);
+            enterRoom(roomId, userId);
             return chatMessage.getSender() + "님이 입장하셨습니다.";
         }
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.LEAVE) {
-            leaveRoom(roomId);
+            leaveRoom(roomId, userId);
             return chatMessage.getSender() + "님이 퇴장하셨습니다.";
         }
         chatMessageService.saveMessage(chatMessage, roomId);
         return chatMessage.getMessage();
     }
 
-    public void enterRoom(Long roomId) {
+    public void enterRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = getChatRoom(roomId);
-        if (!chatRoom.addParticipant()) {
-            throw new IllegalStateException("채팅방이 가득 찼습니다. (최대 20명)");
-        }
+        User user = userService.getUser(userId);
+        checkIfAlreadyJoined(chatRoom, user);
+
+        saveChatParticipant(chatRoom, user);
+        chatRoom.addParticipant();
     }
 
-    public void leaveRoom(Long roomId) {
+    public void leaveRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = getChatRoom(roomId);
+        User user = userService.getUser(userId);
+        checkIfAlreadyLeft(chatRoom, user);
+
+        chatParticipantRepository.deleteByChatRoomAndUser(chatRoom, user);
         chatRoom.removeParticipant();
     }
 
     private ChatRoom getChatRoom(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         return chatRoom;
+    }
+
+    public void checkIfAlreadyJoined(ChatRoom chatRoom, User user) {
+        if (chatParticipantRepository.findByChatRoomAndUser(chatRoom, user).isPresent()) {
+            throw new CustomException(ErrorCode.ALREADY_JOINED);
+        }
+    }
+
+    public void checkIfAlreadyLeft(ChatRoom chatRoom, User user) {
+        if (chatParticipantRepository.findByChatRoomAndUser(chatRoom, user).isEmpty()) {
+            throw new CustomException(ErrorCode.ALREADY_LEFT);
+        }
     }
 
     public void createChatRoom(Meeting meeting) {
         chatRoomRepository.save(new ChatRoom(meeting));
+    }
+
+    private void saveChatParticipant(ChatRoom chatRoom, User user) {
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatRoom(chatRoom)
+                .user(user)
+                .build();
+        chatParticipantRepository.save(chatParticipant);
     }
 }
