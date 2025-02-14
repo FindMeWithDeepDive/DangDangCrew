@@ -61,10 +61,18 @@ public class UserMeetingService {
     public UserMeeting updateMeetingStatus(Meeting meeting, User user, UserMeetingStatus newStatus) {
         UserMeeting userMeeting = findUserMeeting(meeting, user);
         if(userMeeting.getStatus() != newStatus) {
+            deductAvgScore(userMeeting, user);
             userMeeting.updateStatus(newStatus);
             return userMeeting;
         } else {
             throw new CustomException(ErrorCode.NOT_CHANGE);
+        }
+    }
+
+    @Transactional
+    protected void deductAvgScore(UserMeeting userMeeting, User user) {
+        if(userMeeting.getStatus() == UserMeetingStatus.CONFIRMED) {
+            user.deductUserScore();
         }
     }
 

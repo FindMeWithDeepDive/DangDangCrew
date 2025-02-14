@@ -101,6 +101,7 @@ public class MeetingService {
 
         UserMeeting userMeeting = userMeetingService.checkLeaderPermission(meeting);
         UserMeetingStatus currentStatus = userMeeting.getStatus();
+        User changeUser = userService.getUser(dto.getUserId());
         UserMeetingStatus newStatus = dto.getStatus();
 
         if ((currentStatus == UserMeetingStatus.CANCELLED || currentStatus == UserMeetingStatus.WAITING)
@@ -110,7 +111,7 @@ public class MeetingService {
             meeting.decreaseCurPeople();
         }
 
-        userMeeting = userMeetingService.updateMeetingStatus(meeting, user, dto.getStatus());
+        userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
         return meetingMapper.toApplicationDto(userMeeting);
     }
 
