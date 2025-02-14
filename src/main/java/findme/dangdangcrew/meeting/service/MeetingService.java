@@ -90,6 +90,8 @@ public class MeetingService {
          *  when : 유저 도메인에 평가점수 추가 + 평가 도메인 작성된 후
          *  what : 확정 후 취소했을 경우 평가 점수 감점
          * */
+        updateStatus(meeting);
+
         return meetingMapper.toApplicationDto(userMeeting);
     }
 
@@ -110,9 +112,17 @@ public class MeetingService {
         } else if (currentStatus == UserMeetingStatus.CONFIRMED && newStatus == UserMeetingStatus.CANCELLED) {
             meeting.decreaseCurPeople();
         }
-
+        updateStatus(meeting);
         userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
         return meetingMapper.toApplicationDto(userMeeting);
+    }
+
+    private void updateStatus(Meeting meeting) {
+        if(meeting.getMaxPeople().equals(meeting.getCurPeople())){
+            meeting.updateMeetingStatus(MeetingStatus.COMPLETED);
+        } else if(meeting.getCurPeople() < meeting.getMaxPeople()) {
+            meeting.updateMeetingStatus(MeetingStatus.IN_PROGRESS);
+        }
     }
 
     // 모임 신청자 조회
