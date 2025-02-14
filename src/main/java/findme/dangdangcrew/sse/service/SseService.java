@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class SseService {
     private final EmitterRepository emitterRepository;
     private final ClockHolder clockHolder;
-    private static final long TIMEOUT = 120*1000L;
+    private static final long TIMEOUT = 1800*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
     // 알림을 저장하기 위한 연결된 userId 가져오는 로직

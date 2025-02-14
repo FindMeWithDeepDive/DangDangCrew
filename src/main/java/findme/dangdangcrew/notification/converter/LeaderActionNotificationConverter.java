@@ -19,7 +19,6 @@ public class LeaderActionNotificationConverter implements NotificationConverter 
                 notificationEntity.getMessage(),
                 notificationEntity.isRead(),
                 notificationEntity.getMeetingId(),
-                notificationEntity.getMeetingLeaderId(),
                 notificationEntity.getCreatedAt());
     }
 
@@ -39,7 +38,6 @@ public class LeaderActionNotificationConverter implements NotificationConverter 
                 .isRead(leaderActionNotification.isRead())
                 .createdAt(leaderActionNotification.getCreatedAt())
                 .meetingId(leaderActionNotification.getMeetingId())
-                .applyUserId(leaderActionNotification.getMeetingLeaderId())
                 .notificationType(leaderActionNotification.getNotificationType())
                 .build();
     }

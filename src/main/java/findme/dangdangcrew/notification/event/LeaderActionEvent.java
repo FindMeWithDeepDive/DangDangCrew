@@ -6,7 +6,6 @@ package findme.dangdangcrew.notification.event;
  **/
 public record LeaderActionEvent(
         Long targetUserId,
-        Long meetingLeaderId,
         Long meetingId,
         String meetingName,
         LeaderActionType leaderActionType

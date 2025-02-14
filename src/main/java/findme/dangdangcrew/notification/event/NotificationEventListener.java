@@ -2,10 +2,7 @@ package findme.dangdangcrew.notification.event;
 
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
-import findme.dangdangcrew.notification.domain.ApplyNotification;
-import findme.dangdangcrew.notification.domain.HotPlaceNotification;
-import findme.dangdangcrew.notification.domain.NewMeetingNotification;
-import findme.dangdangcrew.notification.domain.Notification;
+import findme.dangdangcrew.notification.domain.*;
 import findme.dangdangcrew.notification.service.NotificationService;
 import findme.dangdangcrew.place.domain.FavoritePlace;
 import findme.dangdangcrew.place.repository.FavoritePlaceRepository;
@@ -121,12 +118,11 @@ public class NotificationEventListener {
         LocalDateTime createdAt = LocalDateTime.now();
 
         // MeetingNotification 생성
-        Notification notification = new ApplyNotification(
+        Notification notification = new LeaderActionNotification(
                 event.targetUserId(),
                 message,
                 false,
                 event.meetingId(),
-                event.meetingLeaderId(),
                 createdAt
         );
 

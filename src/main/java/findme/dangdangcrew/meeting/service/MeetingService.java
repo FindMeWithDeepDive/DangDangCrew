@@ -40,7 +40,7 @@ public class MeetingService {
     private final RedisService redisService;
 
     public Meeting findProgressMeeting(Long id) {
-        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
+        return meetingRepository.findByIdAndStatusIn(id, List.of(MeetingStatus.IN_PROGRESS, MeetingStatus.COMPLETED)).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
     }
 
     // 모임 생성
@@ -87,11 +87,8 @@ public class MeetingService {
 
         UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
 
-        /*
-         * TODO
-         *  when : 유저 도메인에 평가점수 추가 + 평가 도메인 작성된 후
-         *  what : 확정 후 취소했을 경우 평가 점수 감점
-         * */
+        updateStatus(meeting);
+
         return meetingMapper.toApplicationDto(userMeeting);
     }
 
@@ -99,23 +96,37 @@ public class MeetingService {
     @Transactional
     public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto) {
         Meeting meeting = findProgressMeeting(id);
-        User user = userService.getCurrentUser();
 
-        UserMeeting userMeeting = userMeetingService.checkLeaderPermission(meeting);
-        UserMeetingStatus currentStatus = userMeeting.getStatus();
+        userMeetingService.checkLeaderPermission(meeting);
         User changeUser = userService.getUser(dto.getUserId());
+        UserMeeting userMeeting = userMeetingService.findUserMeeting(meeting, changeUser);
+        UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
         LeaderActionType leaderActionType = LeaderActionType.JOIN_REJECTED;
-        if ((currentStatus == UserMeetingStatus.CANCELLED || currentStatus == UserMeetingStatus.WAITING)
-                && newStatus == UserMeetingStatus.CONFIRMED) {
+        if (currentStatus == UserMeetingStatus.WAITING && newStatus == UserMeetingStatus.CONFIRMED) {
             meeting.increaseCurPeople();
+            leaderActionType = LeaderActionType.JOIN_ACCEPTED;
         } else if (currentStatus == UserMeetingStatus.CONFIRMED && newStatus == UserMeetingStatus.CANCELLED) {
             meeting.decreaseCurPeople();
+            leaderActionType = LeaderActionType.KICK_OUT;
         }
 
+        updateStatus(meeting);
         userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
+
+        // LeaderAction 이벤트
+        eventPublisher.publisher(new LeaderActionEvent(changeUser.getId(),meeting.getId(),meeting.getMeetingName(),leaderActionType));
+
         return meetingMapper.toApplicationDto(userMeeting);
+    }
+
+    private void updateStatus(Meeting meeting) {
+        if(meeting.getMaxPeople().equals(meeting.getCurPeople())){
+            meeting.updateMeetingStatus(MeetingStatus.COMPLETED);
+        } else if(meeting.getCurPeople() < meeting.getMaxPeople()) {
+            meeting.updateMeetingStatus(MeetingStatus.IN_PROGRESS);
+        }
     }
 
     // 모임 신청자 조회
@@ -139,7 +150,7 @@ public class MeetingService {
 
     // 장소별 모임 조회
     public List<MeetingBasicResponseDto> findMeetingsByPlaceId(String placeId) {
-        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatus(placeId, MeetingStatus.IN_PROGRESS);
+        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatusIn(placeId, List.of(MeetingStatus.IN_PROGRESS, MeetingStatus.COMPLETED));
         return meetingMapper.toListDto(meetings);
     }
 

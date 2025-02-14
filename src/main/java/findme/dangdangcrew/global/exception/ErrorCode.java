@@ -10,6 +10,15 @@ public enum ErrorCode {
     // User Error
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
 
+    // User Register Error
+    EMAIL_ALREADY_IN_USE(HttpStatus.BAD_REQUEST, "이미 사용 중인 이메일입니다."),
+    NICKNAME_ALREADY_IN_USE(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임입니다."),
+    PHONE_NUMBER_ALREADY_IN_USE(HttpStatus.BAD_REQUEST, "이미 사용 중인 전화번호입니다."),
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 최소 6자리 이상이어야 합니다."),
+
+    // Login Error
+    INCORRECT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+
     // Place Error
     PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
 
@@ -46,6 +55,9 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     MISSING_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 누락되었습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 리프레시 토큰입니다."),
+    INVALID_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "잘못된 인증 정보입니다."),
 
     // LeaderType Error
     INVALID_LEADER_ACTION_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 LeaderActionType 입니다."),
