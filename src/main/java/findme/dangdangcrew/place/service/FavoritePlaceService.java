@@ -8,7 +8,6 @@ import findme.dangdangcrew.place.dto.FavoritePlaceResponseDto;
 import findme.dangdangcrew.place.dto.PlaceRequestDto;
 import findme.dangdangcrew.place.repository.FavoritePlaceRepository;
 import findme.dangdangcrew.user.entity.User;
-import findme.dangdangcrew.user.repository.UserRepository;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
