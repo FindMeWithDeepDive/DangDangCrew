@@ -1,5 +1,7 @@
 package findme.dangdangcrew.notification.converter;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.notification.domain.NewMeetingNotification;
 import findme.dangdangcrew.notification.domain.Notification;
 import findme.dangdangcrew.notification.domain.NotificationEntity;
@@ -32,8 +34,7 @@ public class NewMeetingNotificationConverter implements NotificationConverter{
     @Override
     public NotificationEntity convertToEntity(Notification notification) {
         if (!(notification instanceof NewMeetingNotification newMeetingNotification)) {
-            throw new IllegalArgumentException("잘못된 알림 타입입니다. 기대한 타입: NewMeetingNotification, 받은 타입: "
-                    + notification.getClass().getSimpleName());
+            throw new CustomException(ErrorCode.INVALID_NOTIFICATION_TYPE);
         }
 
         return NotificationEntity.builder()

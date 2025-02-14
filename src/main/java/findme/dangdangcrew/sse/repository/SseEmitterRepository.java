@@ -20,43 +20,14 @@ public class SseEmitterRepository implements EmitterRepository{
     }
 
     @Override
-    public void saveEvent(String eventId, Object event) {
-        events.put(eventId, event);
-    }
-
-    @Override
-    public Map<String, SseEmitter> findAllEmittersStartWithUserId(Long userId) {
-        String userIdPrefix = userId +"_";
-        return emitters.entrySet().stream()
-                .filter(e -> e.getKey().startsWith(userIdPrefix))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @Override
-    public Map<String, Object> findAllEventsStartWithUserId(Long userId) {
-        String userIdPrefix = userId +"_";
-        return events.entrySet().stream()
-                .filter(e->e.getKey().startsWith(userIdPrefix))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @Override
     public void deleteByEventId(String eventId) {
         emitters.remove(eventId);
     }
 
     @Override
-    public void deleteAllEmittersStartWithUserId(Long userId) {
+    public void deleteAllEmittersByUserId(Long userId) {
         String userIdPrefix = userId +"_";
         emitters.forEach((k,v) -> {
-            if(k.startsWith(userIdPrefix)) events.remove(k);
-        });
-    }
-
-    @Override
-    public void deleteAllEventsStartWithUserId(Long userId) {
-        String userIdPrefix = userId +"_";
-        events.forEach((k,v) ->{
             if(k.startsWith(userIdPrefix)) events.remove(k);
         });
     }
