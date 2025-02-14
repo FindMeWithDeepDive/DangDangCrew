@@ -1,5 +1,6 @@
 package findme.dangdangcrew.notification.service;
 
+import findme.dangdangcrew.global.dto.PagingResponseDto;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.notification.converter.NotificationConverterFactory;
@@ -10,6 +11,11 @@ import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,21 +32,21 @@ public class NotificationService {
     private final UserService userService;
 
     // 특정 사용자의 모든 알림 조회
-    public List<Notification> getUserNotifications() {
+    public PagingResponseDto getUserNotifications(int page) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page > 0 ? --page : page, 10, sort);
         User user = userService.getCurrentUser();
-        List<NotificationEntity> entities = notificationRepository.findByTargetUserId(user.getId());
+        Page<NotificationEntity> pagingNotification = notificationRepository.findByTargetUserId(user.getId(), pageable);
 
-        boolean hasInvalidNotification = entities.stream()
-                .anyMatch(notification -> !notification.getTargetUserId().equals(user.getId()));
-
-        if(hasInvalidNotification){
-            throw new CustomException(ErrorCode.NOTIFICATION_OWNER_MISMATCH);
-        }
-
-        return entities.stream()
-                .map(converterFactory::convert) // Entity → Domain 변환
+        long total = pagingNotification.getTotalElements();
+        long pages = pagingNotification.getTotalPages();
+        List<Notification> notifications = pagingNotification.getContent().stream()
+                .map(converterFactory::convert)
                 .collect(Collectors.toList());
+
+        return PagingResponseDto.of(pages, total, notifications);
     }
+
 
     // 특정 알림 읽음 처리
     @Transactional
