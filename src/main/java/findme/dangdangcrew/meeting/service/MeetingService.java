@@ -38,7 +38,7 @@ public class MeetingService {
     private final RedisService redisService;
 
     public Meeting findProgressMeeting(Long id) {
-        return meetingRepository.findByIdAndStatus(id, MeetingStatus.IN_PROGRESS).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
+        return meetingRepository.findByIdAndStatusIn(id, List.of(MeetingStatus.IN_PROGRESS, MeetingStatus.COMPLETED)).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
     }
 
     // 모임 생성
@@ -95,9 +95,10 @@ public class MeetingService {
     public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto) {
         Meeting meeting = findProgressMeeting(id);
 
-        UserMeeting userMeeting = userMeetingService.checkLeaderPermission(meeting);
-        UserMeetingStatus currentStatus = userMeeting.getStatus();
+        userMeetingService.checkLeaderPermission(meeting);
         User changeUser = userService.getUser(dto.getUserId());
+        UserMeeting userMeeting = userMeetingService.findUserMeeting(meeting, changeUser);
+        UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
         if ((currentStatus == UserMeetingStatus.CANCELLED || currentStatus == UserMeetingStatus.WAITING)

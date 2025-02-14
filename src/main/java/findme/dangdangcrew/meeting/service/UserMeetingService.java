@@ -28,14 +28,13 @@ public class UserMeetingService {
     }
 
     // 리더 확인
-    public UserMeeting checkLeaderPermission(Meeting meeting) {
+    public void checkLeaderPermission(Meeting meeting) {
         User user = userService.getCurrentUser();
 
         UserMeeting userMeeting = findUserMeeting(meeting, user);
         if (userMeeting.getStatus() != UserMeetingStatus.LEADER) {
             throw new CustomException(ErrorCode.NOT_LEADER);
         }
-        return userMeeting;
     }
 
     // 유저가 미팅에 참가
