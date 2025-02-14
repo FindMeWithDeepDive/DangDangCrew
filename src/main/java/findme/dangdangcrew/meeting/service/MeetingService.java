@@ -146,7 +146,7 @@ public class MeetingService {
 
     // 장소별 모임 조회
     public List<MeetingBasicResponseDto> findMeetingsByPlaceId(String placeId) {
-        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatus(placeId, MeetingStatus.IN_PROGRESS);
+        List<Meeting> meetings = meetingRepository.findAllByPlace_IdAndStatusIn(placeId, List.of(MeetingStatus.IN_PROGRESS, MeetingStatus.COMPLETED));
         return meetingMapper.toListDto(meetings);
     }
 
