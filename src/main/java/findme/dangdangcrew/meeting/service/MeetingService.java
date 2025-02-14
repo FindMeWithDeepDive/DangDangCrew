@@ -83,7 +83,7 @@ public class MeetingService {
         Meeting meeting = findProgressMeeting(id);
         User user = userService.getCurrentUser();
 
-        UserMeeting userMeeting = userMeetingService.cancelMeetingApplication(meeting, user);
+        UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
 
         /*
          * TODO
@@ -110,7 +110,7 @@ public class MeetingService {
             meeting.decreaseCurPeople();
         }
 
-        userMeeting = userMeetingService.updateMeetingApplication(meeting, user, dto.getStatus());
+        userMeeting = userMeetingService.updateMeetingStatus(meeting, user, dto.getStatus());
         return meetingMapper.toApplicationDto(userMeeting);
     }
 

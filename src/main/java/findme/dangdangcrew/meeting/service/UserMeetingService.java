@@ -57,24 +57,15 @@ public class UserMeetingService {
         return userMeeting.getUser();
     }
 
-    // 신청 취소 - 일반 유저
     @Transactional
-    public UserMeeting cancelMeetingApplication(Meeting meeting, User user) {
+    public UserMeeting updateMeetingStatus(Meeting meeting, User user, UserMeetingStatus newStatus) {
         UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if(userMeeting.getStatus() == UserMeetingStatus.WAITING) {
-            userMeeting.updateStatus(UserMeetingStatus.CANCELLED);
+        if(userMeeting.getStatus() != newStatus) {
+            userMeeting.updateStatus(newStatus);
             return userMeeting;
         } else {
-            throw new IllegalArgumentException("취소할 수 없습니다.");
+            throw new CustomException(ErrorCode.NOT_CHANGE);
         }
-    }
-
-    // 신청 상태 변경 - 모임 생성자
-    @Transactional
-    public UserMeeting updateMeetingApplication(Meeting meeting, User user, UserMeetingStatus status) {
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        userMeeting.updateStatus(status);
-        return userMeeting;
     }
 
     // 모임 신청자 전체 조회 - 모임 생성자
