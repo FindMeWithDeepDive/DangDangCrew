@@ -69,7 +69,8 @@ public class UserMeetingService {
         }
     }
 
-    private void deductAvgScore(UserMeeting userMeeting, User user) {
+    @Transactional
+    protected void deductAvgScore(UserMeeting userMeeting, User user) {
         if(userMeeting.getStatus() == UserMeetingStatus.CONFIRMED) {
             user.deductUserScore();
         }
