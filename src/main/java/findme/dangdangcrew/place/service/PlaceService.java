@@ -37,6 +37,11 @@ public class PlaceService {
                     return placeRepository.save(newPlace);
                 });
     }
+
+    public Place findPlaceByPlaceId(String placeId){
+        return placeRepository.findById(placeId).orElseThrow(()->new CustomException(ErrorCode.PLACE_NOT_FOUND));
+    }
+
     private PlaceResponseDto fetchPlaceFromKakao(String placeName, String x, String y) {
         log.info("Kakao API 호출 - 검색어: {}", placeName);
 
