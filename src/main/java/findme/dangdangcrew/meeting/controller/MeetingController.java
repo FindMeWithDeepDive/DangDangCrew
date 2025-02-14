@@ -18,10 +18,10 @@ public class MeetingController {
 
     private final MeetingService meetingService;
 
-    @PostMapping("/{userId}")
+    @PostMapping
     @Operation(summary = "모임 생성", description = "모임을 생성합니다.")
-    public ResponseEntity<MeetingApplicationResponseDto> createMeeting(@RequestBody MeetingRequestDto dto, @PathVariable("userId") Long userId){
-        MeetingApplicationResponseDto response = meetingService.create(dto, userId);
+    public ResponseEntity<MeetingApplicationResponseDto> createMeeting(@RequestBody MeetingRequestDto dto){
+        MeetingApplicationResponseDto response = meetingService.create(dto);
         return ResponseEntity.ok(response);
     }
 
@@ -32,24 +32,24 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{meetingId}/{userId}")
+    @PostMapping("/{meetingId}/applications/apply")
     @Operation(summary = "모임 참가 신청", description = "유저가 모임 참가 신청합니다.")
-    public ResponseEntity<MeetingApplicationResponseDto> applyMeeting(@PathVariable("meetingId") Long meetingId, @PathVariable("userId") Long userId){
-        MeetingApplicationResponseDto response = meetingService.applyMeetingByMeetingId(meetingId, userId);
+    public ResponseEntity<MeetingApplicationResponseDto> applyMeeting(@PathVariable("meetingId") Long meetingId){
+        MeetingApplicationResponseDto response = meetingService.applyMeetingByMeetingId(meetingId);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{metingId}/{userId}/cancel")
+    @PatchMapping("/{meetingId}/applications/cancel")
     @Operation(summary = "모임 참가 취소", description = "유저가 모임 참가를 취소합니다.")
-    public ResponseEntity<MeetingApplicationResponseDto> cancelMeetingApplication(@PathVariable("metingId") Long meetingId, @PathVariable("userId") Long userId){
-        MeetingApplicationResponseDto response = meetingService.cancelMeetingApplication(meetingId, userId);
+    public ResponseEntity<MeetingApplicationResponseDto> cancelMeetingApplication(@PathVariable("meetingId") Long meetingId){
+        MeetingApplicationResponseDto response = meetingService.cancelMeetingApplication(meetingId);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{meetingId}/status")
+    @PutMapping("/{meetingId}/applications/status")
     @Operation(summary = "(모임 생성자) 모임 상태 변경", description = "모임 생성자가 모임 신청 유저들을 확정/취소합니다.")
     public ResponseEntity<MeetingApplicationResponseDto> updateApplicationStatusByLeader(@PathVariable("meetingId") Long meetingId,
-                                                                               MeetingApplicationUpdateRequestDto dto){
+                                                                               @RequestBody MeetingApplicationUpdateRequestDto dto){
         MeetingApplicationResponseDto response = meetingService.changeMeetingApplicationStatusByLeader(meetingId, dto);
         return ResponseEntity.ok(response);
     }

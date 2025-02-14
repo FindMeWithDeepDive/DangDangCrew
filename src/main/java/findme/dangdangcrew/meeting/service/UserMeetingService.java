@@ -1,10 +1,13 @@
 package findme.dangdangcrew.meeting.service;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.repository.UserMeetingRepository;
 import findme.dangdangcrew.user.entity.User;
+import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +20,22 @@ import java.util.List;
 public class UserMeetingService {
 
     private final UserMeetingRepository userMeetingRepository;
+    private final UserService userService;
 
     public UserMeeting findUserMeeting(Meeting meeting, User user) {
         return userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 이 모임에 속해있지 않습니다."));
+    }
+
+    // 리더 확인
+    public UserMeeting checkLeaderPermission(Meeting meeting) {
+        User user = userService.getCurrentUser();
+
+        UserMeeting userMeeting = findUserMeeting(meeting, user);
+        if (userMeeting.getStatus() != UserMeetingStatus.LEADER) {
+            throw new CustomException(ErrorCode.NOT_LEADER);
+        }
+        return userMeeting;
     }
 
     // 유저가 미팅에 참가
@@ -42,24 +57,23 @@ public class UserMeetingService {
         return userMeeting.getUser();
     }
 
-    // 신청 취소 - 일반 유저
     @Transactional
-    public UserMeeting cancelMeetingApplication(Meeting meeting, User user) {
+    public UserMeeting updateMeetingStatus(Meeting meeting, User user, UserMeetingStatus newStatus) {
         UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if(userMeeting.getStatus() == UserMeetingStatus.WAITING) {
-            userMeeting.updateStatus(UserMeetingStatus.CANCELLED);
+        if(userMeeting.getStatus() != newStatus) {
+            deductAvgScore(userMeeting, user);
+            userMeeting.updateStatus(newStatus);
             return userMeeting;
         } else {
-            throw new IllegalArgumentException("취소할 수 없습니다.");
+            throw new CustomException(ErrorCode.NOT_CHANGE);
         }
     }
 
-    // 신청 상태 변경 - 모임 생성자
     @Transactional
-    public UserMeeting updateMeetingApplication(Meeting meeting, User user, UserMeetingStatus status) {
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        userMeeting.updateStatus(status);
-        return userMeeting;
+    protected void deductAvgScore(UserMeeting userMeeting, User user) {
+        if(userMeeting.getStatus() == UserMeetingStatus.CONFIRMED) {
+            user.deductUserScore();
+        }
     }
 
     // 모임 신청자 전체 조회 - 모임 생성자

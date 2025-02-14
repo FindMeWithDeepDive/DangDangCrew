@@ -64,4 +64,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getCurrentUser());
     }
 
+    @PutMapping("/password")
+    @Operation(summary = "비밀번호 변경", description = "로그인 상태에서 비밀번호를 변경합니다.")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
+        userService.changePassword(request);
+        return ResponseEntity.noContent().build();
+    }
+
 }
