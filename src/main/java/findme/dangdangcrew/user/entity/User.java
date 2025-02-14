@@ -66,4 +66,8 @@ import java.time.LocalDateTime;
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
+
+    public void deductUserScore() {
+        this.userScore = userScore.subtract(BigDecimal.valueOf(0.5));
+    }
 }
