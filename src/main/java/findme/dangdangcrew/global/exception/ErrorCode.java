@@ -28,6 +28,7 @@ public enum ErrorCode {
     MEETING_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미팅을 찾을 수  없습니다."),
     MEETING_EXCEED_LIMIT_PEOPLE(HttpStatus.BAD_REQUEST, "현재 인원은 최대 인원을 초과할 수 없습니다."),
     MEETING_INSUFFICIENT_PEOPLE(HttpStatus.BAD_REQUEST, "현재 인원은 1명 미만이 될 수 없습니다."),
+    NOT_LEADER(HttpStatus.BAD_REQUEST, "현재 로그인한 유저는 리더가 아닙니다."),
 
     // Invalidation Error
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),

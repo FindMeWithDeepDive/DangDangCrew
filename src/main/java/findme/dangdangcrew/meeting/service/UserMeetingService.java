@@ -1,10 +1,13 @@
 package findme.dangdangcrew.meeting.service;
 
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.repository.UserMeetingRepository;
 import findme.dangdangcrew.user.entity.User;
+import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +20,22 @@ import java.util.List;
 public class UserMeetingService {
 
     private final UserMeetingRepository userMeetingRepository;
+    private final UserService userService;
 
     public UserMeeting findUserMeeting(Meeting meeting, User user) {
         return userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 이 모임에 속해있지 않습니다."));
+    }
+
+    // 리더 확인
+    public UserMeeting checkLeaderPermission(Meeting meeting) {
+        User user = userService.getCurrentUser();
+
+        UserMeeting userMeeting = findUserMeeting(meeting, user);
+        if (userMeeting.getStatus() != UserMeetingStatus.LEADER) {
+            throw new CustomException(ErrorCode.NOT_LEADER);
+        }
+        return userMeeting;
     }
 
     // 유저가 미팅에 참가
