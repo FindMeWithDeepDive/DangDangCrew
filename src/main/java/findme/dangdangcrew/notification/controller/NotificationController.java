@@ -21,9 +21,9 @@ public class NotificationController {
 
     // 사용자의 모든 알림 조회 API
     @Operation(summary = "유저의 알림 조회",description = "헤더의 토큰 기반으로 유저의 알림들을 조회합니다.")
-    @GetMapping("/{userId}")
-    public ResponseEntity<ResponseDto<List<Notification>>> getUserNotifications(@PathVariable("userId") Long userId){
-        List<Notification> userNotifications = notificationService.getUserNotifications(userId);
+    @GetMapping
+    public ResponseEntity<ResponseDto<List<Notification>>> getUserNotifications(){
+        List<Notification> userNotifications = notificationService.getUserNotifications();
         return ResponseEntity.ok(ResponseDto.of(
                 userNotifications,
                 "유저의 알림을 성공적으로 조회하였습니다."));

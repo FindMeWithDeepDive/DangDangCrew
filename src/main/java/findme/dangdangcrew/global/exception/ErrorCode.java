@@ -23,6 +23,7 @@ public enum ErrorCode {
     // Notification Error
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 알림입니다."),
     INVALID_NOTIFICATION_TYPE(HttpStatus.BAD_REQUEST, "지원되지 않는 알림 타입입니다."),
+    NOTIFICATION_OWNER_MISMATCH(HttpStatus.BAD_REQUEST, "자신의 알림만 조회 할 수 있습니다."),
 
     // Meeting Error
     MEETING_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미팅을 찾을 수  없습니다."),

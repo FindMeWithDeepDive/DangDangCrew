@@ -20,7 +20,10 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Log4j2
 public class HotPlaceService {
+
+    // 20~30 참가 신청 수로 핫플레이스 기준 잡기/
     private static final int HOTPLACE_THRESHOLD = 3;
+    private static final String HOTPLACE_PREFIX = "hotplace:";
     private final EventPublisher eventPublisher;
     private final PlaceService placeService;
     private final RedisService redisService;
@@ -35,7 +38,7 @@ public class HotPlaceService {
         if(keys == null || keys.isEmpty()) return;
 
         for(String key : keys){
-            String placeId = key.replace("hotplace:", "");
+            String placeId = key.replace(HOTPLACE_PREFIX, "");
             Long count = redisService.getHotPlaceCount(placeId);
 
             if(count >= HOTPLACE_THRESHOLD && !redisService.isAlreadyNotified(placeId)){

@@ -9,6 +9,7 @@ import findme.dangdangcrew.place.dto.PlaceRequestDto;
 import findme.dangdangcrew.place.repository.FavoritePlaceRepository;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
+import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,11 @@ import java.util.stream.Collectors;
 public class FavoritePlaceService {
     private final PlaceService placeService;
     private final FavoritePlaceRepository favoritePlaceRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Transactional
-    public String registerFavoritePlace(Long userId, PlaceRequestDto placeRequestDto){
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+    public FavoritePlaceResponseDto registerFavoritePlace(PlaceRequestDto placeRequestDto){
+        User user = userService.getCurrentUser();
         Place place = placeService.findOrCreatePlace(placeRequestDto);
 
         if(favoritePlaceRepository.existsByUserAndPlace(user,place)){
@@ -44,13 +43,13 @@ public class FavoritePlaceService {
                 .build();
 
         favoritePlaceRepository.save(favoritePlace);
-        log.info("즐겨찾기 등록 완료 - userId: {}, placeId: {}", userId, place.getId());
+        log.info("즐겨찾기 등록 완료 - userId: {}, placeId: {}", user.getId(), place.getId());
 
-        return place.getPlaceName();
+        return FavoritePlaceResponseDto.of(favoritePlace.getPlace(), user.getId());
     }
 
-    public List<FavoritePlaceResponseDto> getAllFavoritePlace(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+    public List<FavoritePlaceResponseDto> getAllFavoritePlace() {
+        User user = userService.getCurrentUser();
         List<FavoritePlace> favoritePlaces = favoritePlaceRepository.findAllByUser(user);
 
         return favoritePlaces.stream()
