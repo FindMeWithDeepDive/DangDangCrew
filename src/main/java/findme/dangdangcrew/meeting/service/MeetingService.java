@@ -13,6 +13,8 @@ import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.ApplyEvent;
+import findme.dangdangcrew.notification.event.LeaderActionEvent;
+import findme.dangdangcrew.notification.event.LeaderActionType;
 import findme.dangdangcrew.notification.event.NewMeetingEvent;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.place.service.PlaceService;
@@ -104,6 +106,7 @@ public class MeetingService {
         User changeUser = userService.getUser(dto.getUserId());
         UserMeetingStatus newStatus = dto.getStatus();
 
+        LeaderActionType leaderActionType = LeaderActionType.JOIN_REJECTED;
         if ((currentStatus == UserMeetingStatus.CANCELLED || currentStatus == UserMeetingStatus.WAITING)
                 && newStatus == UserMeetingStatus.CONFIRMED) {
             meeting.increaseCurPeople();

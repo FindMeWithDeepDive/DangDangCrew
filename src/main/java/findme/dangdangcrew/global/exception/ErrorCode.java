@@ -47,6 +47,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     MISSING_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 누락되었습니다."),
 
+    // LeaderType Error
+    INVALID_LEADER_ACTION_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 LeaderActionType 입니다."),
+
     ;
 
     private final HttpStatus status;

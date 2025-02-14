@@ -91,7 +91,7 @@ public class SseService {
 
     }
 
-    // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림
+    // 유저가 모임 참가 신청 (모임장 알림) | 모임 참가 신청 결과 알림 (참가 신청 유저 알림)
     @Async
     public void sendNotificationToClient(Long userId, String message){
         SseEmitter sseEmitter = emitterRepository.findEmitterByUserId(userId);
