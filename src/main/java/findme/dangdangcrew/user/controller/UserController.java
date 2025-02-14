@@ -2,6 +2,7 @@ package findme.dangdangcrew.user.controller;
 
 import findme.dangdangcrew.global.config.JwtTokenProvider;
 import findme.dangdangcrew.user.dto.*;
+import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,25 +47,21 @@ public class UserController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "로그아웃을 수행하고 Refresh Token을 삭제합니다.")
-    public ResponseEntity<Void> logout(@RequestHeader(value = "authorization", required = false) String token) {
-        logger.info("🚀 Received Authorization Header: {}", token);
-        try {
-            String accessToken = jwtTokenProvider.extractToken(token);
-            userService.logout(accessToken);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            logger.error("❌ {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public ResponseEntity<Void> logout() {
+        userService.logout();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")
     @Operation(summary = "내 정보 조회", description = "JWT 토큰을 기반으로 본인 정보를 조회합니다.")
-    public ResponseEntity<UserResponseDto> getUserInfo(
-            @RequestHeader(value = "Authorization") String authorizationHeader) {
+    public ResponseEntity<UserResponseDto> getUserInfo() {
+        return ResponseEntity.ok(userService.getUserInfo());
+    }
 
-        String token = jwtTokenProvider.extractToken(authorizationHeader);
-        return ResponseEntity.ok(userService.getUserInfo(token));
+    @GetMapping("/me/entity")
+    @Operation(summary = "내 엔티티 조회", description = "JWT 토큰을 기반으로 본인 `User` 엔티티 정보를 반환합니다.")
+    public ResponseEntity<User> getCurrentUserEntity() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 
 }

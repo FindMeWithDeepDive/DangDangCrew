@@ -3,6 +3,7 @@ package findme.dangdangcrew.user.service;
 import findme.dangdangcrew.global.config.JwtTokenProvider;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
+import findme.dangdangcrew.global.service.RedisService;
 import findme.dangdangcrew.user.controller.UserController;
 import findme.dangdangcrew.user.dto.*;
 import findme.dangdangcrew.user.entity.User;
@@ -11,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +26,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final StringRedisTemplate redisTemplate;
+    //private final StringRedisTemplate redisTemplate;
+    private final RedisService redisService;
+
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
@@ -71,7 +76,8 @@ public class UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
+        //redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
+        redisService.saveRefreshToken(user.getEmail(), refreshToken);
 
         return new TokenResponseDto(accessToken, refreshToken);
     }
@@ -83,7 +89,9 @@ public class UserService {
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
 
         // 2.Redis에 저장된 Refresh Token과 비교
-        String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
+        //String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
+        String storedRefreshToken = redisService.getRefreshToken(email);
+
         if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
             throw new RuntimeException("Invalid or expired refresh token. Please log in again.");
         }
@@ -94,24 +102,13 @@ public class UserService {
         return new TokenResponseDto(newAccessToken, refreshToken);
     }
 
-    public void logout(String accessToken) {
-        // Access Token에서 사용자 이메일 추출
-        String email = jwtTokenProvider.getEmailFromToken(accessToken);
-        // Redis에서 Refresh Token 삭제
-        Boolean isDeleted = redisTemplate.delete("refresh:" + email);
-
-        if (Boolean.TRUE.equals(isDeleted)) {
-            logger.info("✅ Refresh Token for {} successfully deleted from Redis", email);
-        } else {
-            logger.warn("❌ Failed to delete Refresh Token for {} or token does not exist", email);
-        }
+    public void logout() {
+        User user = getCurrentUser();
+        redisService.deleteRefreshToken(user.getEmail());
     }
 
-    public UserResponseDto getUserInfo(String token) {
-        String email = jwtTokenProvider.getEmailFromToken(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
+    public UserResponseDto getUserInfo() {
+        User user = getCurrentUser(); // SecurityContext에서 현재 로그인한 유저 가져오기
         return convertToDto(user);
     }
 
@@ -130,5 +127,22 @@ public class UserService {
     public User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+      
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User is not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof UserDetails)) {
+            throw new RuntimeException("Authentication principal is not UserDetails type");
+        }
+
+        UserDetails userDetails = (UserDetails) principal;
+        return userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

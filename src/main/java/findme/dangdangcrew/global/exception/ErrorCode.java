@@ -10,6 +10,9 @@ public enum ErrorCode {
     // User Error
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
 
+    // Place Error
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
+
     // FavoritePlace Error
     ALREADY_FAVORITE_PLACE(HttpStatus.BAD_REQUEST, "이미 즐겨찾기한 장소입니다."),
 
@@ -35,6 +38,12 @@ public enum ErrorCode {
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
     ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 채팅방에 참여한 사용자입니다."),
     ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 채팅방을 나간 사용자입니다."),
+
+    // JWT Token Error
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    MISSING_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 누락되었습니다."),
+
     ;
 
     private final HttpStatus status;
