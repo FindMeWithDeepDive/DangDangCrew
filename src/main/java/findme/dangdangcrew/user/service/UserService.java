@@ -153,6 +153,5 @@ public class UserService {
 
         // 새로운 비밀번호 암호화 후 저장
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
     }
 }
