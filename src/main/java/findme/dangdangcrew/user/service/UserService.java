@@ -11,7 +11,6 @@ import findme.dangdangcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -81,7 +80,6 @@ public class UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        //redisTemplate.opsForValue().set("refresh:" + user.getEmail(), refreshToken, 14, TimeUnit.DAYS);
         redisService.saveRefreshToken(user.getEmail(), refreshToken);
 
         return new TokenResponseDto(accessToken, refreshToken);
@@ -94,7 +92,6 @@ public class UserService {
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
 
         // 2.Redis에 저장된 Refresh Token과 비교
-        //String storedRefreshToken = redisTemplate.opsForValue().get("refresh:" + email);
         String storedRefreshToken = redisService.getRefreshToken(email);
 
         if (storedRefreshToken == null) {
