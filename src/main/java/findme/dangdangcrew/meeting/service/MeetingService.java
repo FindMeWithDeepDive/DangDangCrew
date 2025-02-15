@@ -69,6 +69,11 @@ public class MeetingService {
     public MeetingApplicationResponseDto applyMeetingByMeetingId(Long id) {
         Meeting meeting = findProgressMeeting(id);
         User user = userService.getCurrentUser();
+
+        if(userMeetingService.findExistingUserMeeting(meeting, user)){
+            throw new CustomException(ErrorCode.MEETING_ALREADY_EXISTS);
+        }
+
         Place place = meeting.getPlace();
 
         UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.WAITING);

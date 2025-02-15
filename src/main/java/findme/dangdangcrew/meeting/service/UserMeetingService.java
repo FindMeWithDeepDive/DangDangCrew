@@ -9,10 +9,12 @@ import findme.dangdangcrew.meeting.repository.UserMeetingRepository;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,5 +96,18 @@ public class UserMeetingService {
 
     public List<UserMeeting> findUserMeetingByUser(User user){
         return userMeetingRepository.findAllByUser_Id(user.getId());
+    }
+
+    // 기존 신청 여부 확인
+    public boolean findExistingUserMeeting(Meeting meeting, User user) {
+        Optional<UserMeeting> userMeeting = userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId());
+        return userMeeting.isPresent();
+    }
+
+    // 스케줄링
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void deleteCancelledApplications(){
+        userMeetingRepository.deleteAllByStatus(UserMeetingStatus.CANCELLED);
     }
 }
