@@ -1,9 +1,7 @@
 package findme.dangdangcrew.meeting.service;
 
-import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
-import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
 import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
 import findme.dangdangcrew.meeting.dto.MeetingUserResponseDto;
@@ -14,9 +12,6 @@ import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
-import findme.dangdangcrew.notification.event.NewMeetingEvent;
-import findme.dangdangcrew.place.domain.Place;
-import findme.dangdangcrew.place.service.PlaceService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;

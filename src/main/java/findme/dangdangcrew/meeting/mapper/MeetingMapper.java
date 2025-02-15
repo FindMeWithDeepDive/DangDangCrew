@@ -4,7 +4,6 @@ import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
 import findme.dangdangcrew.place.domain.Place;
-import findme.dangdangcrew.user.entity.User;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
 

@@ -2,7 +2,6 @@ package findme.dangdangcrew.meeting.controller;
 
 import findme.dangdangcrew.global.dto.ResponseDto;
 import findme.dangdangcrew.meeting.dto.*;
-import findme.dangdangcrew.meeting.service.MeetingLeaderService;
 import findme.dangdangcrew.meeting.service.MeetingService;
 import findme.dangdangcrew.meeting.service.MeetingUserService;
 import io.swagger.v3.oas.annotations.Operation;
