@@ -26,7 +26,7 @@ public class UserMeetingService {
 
     public UserMeeting findUserMeeting(Meeting meeting, User user) {
         return userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 이 모임에 속해있지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEETING_USER_NOT_EXISTS));
     }
 
     // 리더 확인
