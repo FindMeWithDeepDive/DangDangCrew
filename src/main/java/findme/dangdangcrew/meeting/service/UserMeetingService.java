@@ -29,10 +29,6 @@ public class UserMeetingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MEETING_USER_NOT_EXISTS));
     }
 
-    public List<UserMeeting> findConfirmedUsersByMeeting(Meeting meeting) {
-        return userMeetingRepository.findAllByStatusAndMeeting_Id(UserMeetingStatus.CONFIRMED, meeting.getId());
-    }
-
     // 리더 확인
     public void verifyLeaderPermission(Meeting meeting) {
         User user = userService.getCurrentUser();

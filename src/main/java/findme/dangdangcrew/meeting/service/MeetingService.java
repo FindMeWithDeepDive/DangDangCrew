@@ -53,7 +53,7 @@ public class MeetingService {
         eventPublisher.publisher(new NewMeetingEvent(place.getPlaceName(), meeting.getId(), place.getId()));
 
         User user = userService.getCurrentUser();
-        UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.LEADER);
+        UserMeeting userMeeting = userMeetingService.createUserMeeting(meeting, user, UserMeetingStatus.LEADER);
 
         return meetingMapper.toApplicationDto(userMeeting);
     }
@@ -70,13 +70,13 @@ public class MeetingService {
         Meeting meeting = findProgressMeeting(id);
         User user = userService.getCurrentUser();
 
-        if(userMeetingService.findExistingUserMeeting(meeting, user)){
+        if(userMeetingService.isUserAlreadyInMeeting(meeting, user)){
             throw new CustomException(ErrorCode.MEETING_ALREADY_EXISTS);
         }
 
         Place place = meeting.getPlace();
 
-        UserMeeting userMeeting = userMeetingService.saveUserAndMeeting(meeting, user, UserMeetingStatus.WAITING);
+        UserMeeting userMeeting = userMeetingService.createUserMeeting(meeting, user, UserMeetingStatus.WAITING);
         User leader = userMeetingService.findLeader(meeting);
 
         eventPublisher.publisher(new ApplyEvent(leader.getId(), user.getNickname(), user.getId(), meeting.getId(), meeting.getMeetingName()));
@@ -91,8 +91,7 @@ public class MeetingService {
         User user = userService.getCurrentUser();
 
         UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
-
-        updateStatus(meeting);
+        updateMeetingStatus(meeting);
 
         return meetingMapper.toApplicationDto(userMeeting);
     }
@@ -102,9 +101,9 @@ public class MeetingService {
     public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto) {
         Meeting meeting = findProgressMeeting(id);
 
-        userMeetingService.checkLeaderPermission(meeting);
+        userMeetingService.verifyLeaderPermission(meeting);
         User changeUser = userService.getUser(dto.getUserId());
-        UserMeeting userMeeting = userMeetingService.findUserMeeting(meeting, changeUser);
+        UserMeeting userMeeting = userMeetingService.getUserMeeting(meeting, changeUser);
         UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
@@ -117,7 +116,7 @@ public class MeetingService {
             leaderActionType = LeaderActionType.KICK_OUT;
         }
 
-        updateStatus(meeting);
+        updateMeetingStatus(meeting);
         userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
 
         // LeaderAction 이벤트
@@ -126,19 +125,15 @@ public class MeetingService {
         return meetingMapper.toApplicationDto(userMeeting);
     }
 
-    private void updateStatus(Meeting meeting) {
-        if(meeting.getMaxPeople().equals(meeting.getCurPeople())){
-            meeting.updateMeetingStatus(MeetingStatus.COMPLETED);
-        } else if(meeting.getCurPeople() < meeting.getMaxPeople()) {
-            meeting.updateMeetingStatus(MeetingStatus.IN_PROGRESS);
-        }
+    private void updateMeetingStatus(Meeting meeting) {
+        meeting.updateMeetingStatus(meeting.getCurPeople().equals(meeting.getMaxPeople()) ? MeetingStatus.COMPLETED : MeetingStatus.IN_PROGRESS);
     }
 
     // 모임 신청자 조회
     public List<MeetingApplicationResponseDto> readAllApplications(Long id) {
         Meeting meeting = findProgressMeeting(id);
 
-        userMeetingService.checkLeaderPermission(meeting);
+        userMeetingService.verifyLeaderPermission(meeting);
 
         List<UserMeeting> userMeetings = userMeetingService.findWaitingByMeetingId(meeting);
         return meetingMapper.toListApplicationDto(userMeetings);
@@ -148,7 +143,6 @@ public class MeetingService {
     // 모임 확정자 조회
     public List<MeetingApplicationResponseDto> readAllConfirmed(Long id) {
         Meeting meeting = findProgressMeeting(id);
-
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
         return meetingMapper.toListApplicationDto(userMeetings);
     }
@@ -172,7 +166,7 @@ public class MeetingService {
     @Transactional
     public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto) {
         Meeting meeting = findProgressMeeting(id);
-        userMeetingService.checkLeaderPermission(meeting);
+        userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeeting(
                 meetingRequestDto.getMeetingName(),
                 meetingRequestDto.getInformation(),
@@ -185,7 +179,7 @@ public class MeetingService {
     @Transactional
     public void deleteMeeting(Long id) {
         Meeting meeting = findProgressMeeting(id);
-        userMeetingService.checkLeaderPermission(meeting);
+        userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeetingStatus(MeetingStatus.DELETED);
         userMeetingService.delete(meeting);
     }
@@ -194,7 +188,7 @@ public class MeetingService {
     @Transactional
     public List<MeetingUsersResponseDto> quitMeeting(Long id) {
         Meeting meeting = findProgressMeeting(id);
-        userMeetingService.checkLeaderPermission(meeting);
+        userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeetingStatus(MeetingStatus.CLOSED);
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
         List<User> users = userMeetings.stream().map(UserMeeting::getUser).toList();
@@ -204,12 +198,12 @@ public class MeetingService {
     // (모임 생성자) 참석/불참 여부 변경
     @Transactional
     public List<MeetingUsersResponseDto> checkAttendedOrAbsent(Long id, List<MeetingCheckUsersRequestDto> dtos) {
-        Meeting meeting = findProgressMeeting(id);
-        userMeetingService.checkLeaderPermission(meeting);
+        Meeting meeting = meetingRepository.findByIdAndStatus(id, MeetingStatus.CLOSED).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
+        userMeetingService.verifyLeaderPermission(meeting);
 
         List<User> users = dtos.stream().map(dto -> {
             User user = userService.getUser(dto.getUserId());
-            UserMeeting userMeeting = userMeetingService.findUserMeeting(meeting, user);
+            UserMeeting userMeeting = userMeetingService.getUserMeeting(meeting, user);
             userMeeting.updateStatus(dto.getStatus());
             return user;
         }).toList();
