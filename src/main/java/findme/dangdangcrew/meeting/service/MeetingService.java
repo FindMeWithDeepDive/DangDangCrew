@@ -78,6 +78,7 @@ public class MeetingService {
     @Transactional
     public MeetingUserResponseDto create(MeetingRequestDto meetingRequestDto) {
         Place place = placeService.findOrCreatePlace(meetingRequestDto.getPlaceRequestDto());
+        validateMeetingCapacity(meetingRequestDto.getMaxPeople());
         Meeting meeting = meetingMapper.toEntity(meetingRequestDto, place);
         meeting = meetingRepository.save(meeting);
         chatRoomService.createChatRoom(meeting);
@@ -87,5 +88,11 @@ public class MeetingService {
         UserMeeting userMeeting = userMeetingService.createUserMeeting(meeting, user, UserMeetingStatus.LEADER);
 
         return meetingMapper.toUserDto(userMeeting);
+    }
+
+    public void validateMeetingCapacity(int maxPeople) {
+        if (maxPeople < 2 || maxPeople > 10) {
+            throw new CustomException(ErrorCode.INVALID_MEETING_CAPACITY);
+        }
     }
 }

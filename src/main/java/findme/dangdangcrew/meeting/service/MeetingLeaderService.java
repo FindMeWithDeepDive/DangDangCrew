@@ -66,6 +66,7 @@ public class MeetingLeaderService {
     @Transactional
     public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto) {
         Meeting meeting = meetingService.findProgressMeeting(id);
+        meetingService.validateMeetingCapacity(meetingRequestDto.getMaxPeople());
         userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeeting(
                 meetingRequestDto.getMeetingName(),
