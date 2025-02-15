@@ -36,14 +36,14 @@ public class MeetingController {
         return ResponseEntity.ok(ResponseDto.of(response, "모임 정보 조회를 성공하였습니다."));
     }
 
-    @PostMapping("/{meetingId}/applications/apply")
+    @PostMapping("/{meetingId}/applications")
     @Operation(summary = "모임 참가 신청", description = "유저가 모임 참가 신청합니다.")
     public ResponseEntity<ResponseDto<MeetingUserResponseDto>> applyMeeting(@PathVariable("meetingId") Long meetingId){
         MeetingUserResponseDto response = meetingUserService.applyMeetingByMeetingId(meetingId);
         return ResponseEntity.ok(ResponseDto.of(response, "모임 참가 신청을 성공적으로 완료하였습니다."));
     }
 
-    @PatchMapping("/{meetingId}/applications/cancel")
+    @PatchMapping("/{meetingId}/applications")
     @Operation(summary = "모임 참가 취소", description = "유저가 모임 참가를 취소합니다.")
     public ResponseEntity<ResponseDto<MeetingUserResponseDto>> cancelMeetingApplication(@PathVariable("meetingId") Long meetingId){
         MeetingUserResponseDto response = meetingUserService.cancelMeetingApplication(meetingId);
