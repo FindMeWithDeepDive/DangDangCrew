@@ -91,4 +91,8 @@ public class UserMeetingService {
         List<UserMeeting> userMeetings = userMeetingRepository.findAllByMeeting_Id(meeting.getId());
         userMeetings.forEach(userMeeting -> userMeeting.updateStatus(UserMeetingStatus.REMOVED));
     }
+
+    public List<UserMeeting> findUserMeetingByUser(User user){
+        return userMeetingRepository.findAllByUser_Id(user.getId());
+    }
 }

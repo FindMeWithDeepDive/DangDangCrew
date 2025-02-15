@@ -75,6 +75,13 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/my")
+    @Operation(summary = "내 모임 조회", description = "유저가 가입한 모든 모임을 조회합니다.")
+    public ResponseEntity<List<MeetingBasicResponseDto>> getMeetingsByUser(){
+        List<MeetingBasicResponseDto> response = meetingService.findMyMeetings();
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{meetingId}")
     @Operation(summary = "(모임 생성자) 모임 수정", description = "모임 생성자가 모임을 수정합니다.")
     public ResponseEntity<MeetingDetailResponseDto> updateMeeting(@PathVariable("meetingId") Long meetingId, @RequestBody MeetingRequestDto dto){

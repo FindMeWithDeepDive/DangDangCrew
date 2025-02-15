@@ -154,6 +154,15 @@ public class MeetingService {
         return meetingMapper.toListDto(meetings);
     }
 
+    // 내 모임 조회
+    public List<MeetingBasicResponseDto> findMyMeetings(){
+        User user = userService.getCurrentUser();
+        List<UserMeeting> userMeetings = userMeetingService.findUserMeetingByUser(user);
+        List<Long> meetingIds = userMeetings.stream().map(meeting -> meeting.getMeeting().getId()).toList();
+        List<Meeting> meetings = meetingRepository.findAllByIdIn(meetingIds);
+        return meetingMapper.toListDto(meetings);
+    }
+
     // 모임 수정
     @Transactional
     public MeetingDetailResponseDto updateMeeting(Long id, MeetingRequestDto meetingRequestDto) {

@@ -15,4 +15,6 @@ public interface UserMeetingRepository extends JpaRepository<UserMeeting, Long> 
     Optional<UserMeeting> findFirstByMeeting_IdAndUser_Id(Long meetingId, Long userId);
 
     List<UserMeeting> findAllByMeeting_Id(Long meetingId);
+
+    List<UserMeeting> findAllByUser_Id(Long userId);
 }

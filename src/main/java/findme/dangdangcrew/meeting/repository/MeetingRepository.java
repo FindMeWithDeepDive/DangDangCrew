@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     List<Meeting> findAllByPlace_IdAndStatusIn(String placeId, List<MeetingStatus> statuses);
     Optional<Meeting> findByIdAndStatusIn(Long id, List<MeetingStatus> status);
+    List<Meeting> findAllByIdIn(List<Long> meetingIds);
 }
