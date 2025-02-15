@@ -41,6 +41,13 @@ public class UserMeetingService {
         }
     }
 
+    // 일반 유저 확인
+    public void verifyUser(Meeting meeting, User user) {
+        if(getUserMeeting(meeting, user).getStatus() == UserMeetingStatus.LEADER){
+            throw new CustomException(ErrorCode.LEADER_CANNOT_CANCEL);
+        }
+    }
+
     // 유저가 미팅에 참가
     @Transactional
     public UserMeeting createUserMeeting(Meeting meeting, User user, UserMeetingStatus status) {

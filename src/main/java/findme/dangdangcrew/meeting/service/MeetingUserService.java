@@ -49,6 +49,7 @@ public class MeetingUserService {
         Meeting meeting = meetingService.findProgressMeeting(id);
         User user = userService.getCurrentUser();
 
+        userMeetingService.verifyUser(meeting, user);
         UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
         meetingService.updateMeetingStatus(meeting);
 
