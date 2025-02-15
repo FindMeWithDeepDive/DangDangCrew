@@ -189,4 +189,15 @@ public class MeetingService {
         meeting.updateMeetingStatus(MeetingStatus.DELETED);
         userMeetingService.delete(meeting);
     }
+
+    // (모임 생성자) 모임 상태를 종료로 변경
+    @Transactional
+    public List<MeetingConfirmedUsersResponseDto> quitMeeting(Long id) {
+        Meeting meeting = findProgressMeeting(id);
+        userMeetingService.checkLeaderPermission(meeting);
+        meeting.updateMeetingStatus(MeetingStatus.CLOSED);
+        List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
+        List<User> users = userMeetings.stream().map(UserMeeting::getUser).toList();
+        return meetingMapper.toListConfirmedUsersDto(users);
+    }
 }

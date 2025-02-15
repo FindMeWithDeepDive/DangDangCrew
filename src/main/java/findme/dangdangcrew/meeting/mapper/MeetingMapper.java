@@ -4,6 +4,7 @@ import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
 import findme.dangdangcrew.place.domain.Place;
+import findme.dangdangcrew.user.entity.User;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,14 @@ public class MeetingMapper {
     public List<MeetingApplicationResponseDto> toListApplicationDto(List<UserMeeting> userMeetings) {
         return userMeetings.stream()
                 .map(this::toApplicationDto)
+                .toList();
+    }
+
+    public List<MeetingConfirmedUsersResponseDto> toListConfirmedUsersDto(List<User> users) {
+        return users.stream().map(user -> MeetingConfirmedUsersResponseDto.builder()
+                .userId(user.getId())
+                .userName(user.getNickname())
+                .build())
                 .toList();
     }
 }

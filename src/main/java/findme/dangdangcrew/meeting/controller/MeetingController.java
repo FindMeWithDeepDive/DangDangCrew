@@ -95,4 +95,11 @@ public class MeetingController {
         meetingService.deleteMeeting(meetingId);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{meetingId}/quit")
+    @Operation(summary = "(모임 생성자) 모임 종료", description = "모임 생성자가 모임 종료시 종료 버튼을 누릅니다.")
+    public ResponseEntity<List<MeetingConfirmedUsersResponseDto>> quitMeeting(@PathVariable("meetingId") Long meetingId){
+        List<MeetingConfirmedUsersResponseDto> response = meetingService.quitMeeting(meetingId);
+        return ResponseEntity.ok(response);
+    }
 }
