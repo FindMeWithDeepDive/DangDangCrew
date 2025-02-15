@@ -192,12 +192,28 @@ public class MeetingService {
 
     // (모임 생성자) 모임 상태를 종료로 변경
     @Transactional
-    public List<MeetingConfirmedUsersResponseDto> quitMeeting(Long id) {
+    public List<MeetingUsersResponseDto> quitMeeting(Long id) {
         Meeting meeting = findProgressMeeting(id);
         userMeetingService.checkLeaderPermission(meeting);
         meeting.updateMeetingStatus(MeetingStatus.CLOSED);
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
         List<User> users = userMeetings.stream().map(UserMeeting::getUser).toList();
-        return meetingMapper.toListConfirmedUsersDto(users);
+        return meetingMapper.toListMeetingUsersDto(users);
+    }
+
+    // (모임 생성자) 참석/불참 여부 변경
+    @Transactional
+    public List<MeetingUsersResponseDto> checkAttendedOrAbsent(Long id, List<MeetingCheckUsersRequestDto> dtos) {
+        Meeting meeting = findProgressMeeting(id);
+        userMeetingService.checkLeaderPermission(meeting);
+
+        List<User> users = dtos.stream().map(dto -> {
+            User user = userService.getUser(dto.getUserId());
+            UserMeeting userMeeting = userMeetingService.findUserMeeting(meeting, user);
+            userMeeting.updateStatus(dto.getStatus());
+            return user;
+        }).toList();
+
+        return meetingMapper.toListMeetingUsersDto(users);
     }
 }

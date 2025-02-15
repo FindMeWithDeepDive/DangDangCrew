@@ -62,8 +62,8 @@ public class MeetingMapper {
                 .toList();
     }
 
-    public List<MeetingConfirmedUsersResponseDto> toListConfirmedUsersDto(List<User> users) {
-        return users.stream().map(user -> MeetingConfirmedUsersResponseDto.builder()
+    public List<MeetingUsersResponseDto> toListMeetingUsersDto(List<User> users) {
+        return users.stream().map(user -> MeetingUsersResponseDto.builder()
                 .userId(user.getId())
                 .userName(user.getNickname())
                 .build())

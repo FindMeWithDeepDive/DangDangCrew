@@ -98,8 +98,15 @@ public class MeetingController {
 
     @PatchMapping("/{meetingId}/quit")
     @Operation(summary = "(모임 생성자) 모임 종료", description = "모임 생성자가 모임 종료시 종료 버튼을 누릅니다.")
-    public ResponseEntity<List<MeetingConfirmedUsersResponseDto>> quitMeeting(@PathVariable("meetingId") Long meetingId){
-        List<MeetingConfirmedUsersResponseDto> response = meetingService.quitMeeting(meetingId);
+    public ResponseEntity<List<MeetingUsersResponseDto>> quitMeeting(@PathVariable("meetingId") Long meetingId){
+        List<MeetingUsersResponseDto> response = meetingService.quitMeeting(meetingId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{meetingId}/check")
+    @Operation(summary = "(모임 생성자) 모임 참석 여부 변경", description = "모임 생성자가 모임 종료시 모임 참석 여부를 확인합니다.")
+    public ResponseEntity<List<MeetingUsersResponseDto>> checkUserMeetingStatus(@PathVariable("meetingId") Long meetingId, @RequestBody List<MeetingCheckUsersRequestDto> dto){
+        List<MeetingUsersResponseDto> response = meetingService.checkAttendedOrAbsent(meetingId, dto);
         return ResponseEntity.ok(response);
     }
 }
