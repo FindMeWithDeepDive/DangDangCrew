@@ -2,6 +2,7 @@ package findme.dangdangcrew.meeting.service;
 
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
+import findme.dangdangcrew.global.publisher.EventPublisher;
 import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
 import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
 import findme.dangdangcrew.meeting.dto.MeetingUserResponseDto;
@@ -12,6 +13,8 @@ import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
+import findme.dangdangcrew.notification.event.LeaderActionEvent;
+import findme.dangdangcrew.notification.event.LeaderActionType;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class MeetingLeaderService {
     private final MeetingMapper meetingMapper;
     private final UserService userService;
     private final UserMeetingService userMeetingService;
+    private final EventPublisher eventPublisher;
 
     // 모임 신청 상태 변경
     @Transactional
@@ -41,13 +45,20 @@ public class MeetingLeaderService {
         UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
+        LeaderActionType leaderActionType = LeaderActionType.JOIN_REJECTED;
         if (currentStatus == UserMeetingStatus.WAITING && newStatus == UserMeetingStatus.CONFIRMED) {
             meeting.increaseCurPeople();
+            leaderActionType = LeaderActionType.JOIN_ACCEPTED;
         } else if (currentStatus == UserMeetingStatus.CONFIRMED && newStatus == UserMeetingStatus.CANCELLED) {
             meeting.decreaseCurPeople();
+            leaderActionType = LeaderActionType.KICK_OUT;
         }
         meetingService.updateMeetingStatus(meeting);
         userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
+
+        // LeaderAction 이벤트
+        eventPublisher.publisher(new LeaderActionEvent(changeUser.getId(),meeting.getId(),meeting.getMeetingName(),leaderActionType));
+
         return meetingMapper.toUserDto(userMeeting);
     }
 
