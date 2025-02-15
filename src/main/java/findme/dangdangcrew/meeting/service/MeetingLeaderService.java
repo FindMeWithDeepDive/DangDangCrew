@@ -95,9 +95,9 @@ public class MeetingLeaderService {
         Meeting meeting = meetingService.findProgressMeeting(id);
         userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeetingStatus(MeetingStatus.CLOSED);
+
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
-        List<User> users = userMeetings.stream().map(UserMeeting::getUser).toList();
-        return meetingMapper.toListMeetingUsersDto(users);
+        return meetingMapper.toListMeetingUsersDto(userMeetings);
     }
 
     // 참석/불참 여부 변경
@@ -106,13 +106,17 @@ public class MeetingLeaderService {
         Meeting meeting = meetingRepository.findByIdAndStatus(id, MeetingStatus.CLOSED).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
         userMeetingService.verifyLeaderPermission(meeting);
 
-        List<User> users = dtos.stream().map(dto -> {
-            User user = userService.getUser(dto.getUserId());
-            UserMeeting userMeeting = userMeetingService.getUserMeeting(meeting, user);
-            userMeeting.updateStatus(dto.getStatus());
-            return user;
-        }).toList();
+        List<Long> userIds = dtos.stream().map(MeetingUserStatusUpdateRequestDto::getUserId).toList();
+        List<UserMeeting> userMeetings = userMeetingService.findUserMeetingsByMeetingAndUserIds(meeting, userIds);
 
-        return meetingMapper.toListMeetingUsersDto(users);
+        for (UserMeeting userMeeting : userMeetings) {
+            MeetingUserStatusUpdateRequestDto dto = dtos.stream()
+                    .filter(d -> d.getUserId().equals(userMeeting.getUser().getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            userMeeting.updateStatus(dto.getStatus());
+        }
+
+        return meetingMapper.toListMeetingUsersDto(userMeetings);
     }
 }

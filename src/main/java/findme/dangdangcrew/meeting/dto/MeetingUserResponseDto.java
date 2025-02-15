@@ -13,5 +13,5 @@ public class MeetingUserResponseDto {
 
     private Long meetingId;
 
-    private UserMeetingStatus status;
+    private UserMeetingStatus userMeetingStatus;
 }

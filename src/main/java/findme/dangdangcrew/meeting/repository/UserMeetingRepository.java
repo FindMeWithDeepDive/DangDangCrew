@@ -21,4 +21,6 @@ public interface UserMeetingRepository extends JpaRepository<UserMeeting, Long> 
 
     @Modifying
     void deleteAllByStatus(UserMeetingStatus status);
+
+    List<UserMeeting> findAllByMeeting_IdAndUser_IdIn(Long meetingId, List<Long> userIds);
 }

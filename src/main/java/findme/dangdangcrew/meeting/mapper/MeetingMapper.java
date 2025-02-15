@@ -53,7 +53,7 @@ public class MeetingMapper {
                 .meetingId(userMeeting.getMeeting().getId())
                 .userId(userMeeting.getUser().getId())
                 .userName(userMeeting.getUser().getName())
-                .status(userMeeting.getStatus())
+                .userMeetingStatus(userMeeting.getStatus())
                 .build();
     }
 
@@ -61,11 +61,14 @@ public class MeetingMapper {
         return userMeetings.stream().map(this::toUserDto).toList();
     }
 
-    public List<MeetingUserResponseDto> toListMeetingUsersDto(List<User> users) {
-        return users.stream().map(user -> MeetingUserResponseDto.builder()
-                .userId(user.getId())
-                .userName(user.getNickname())
-                .build())
+    public List<MeetingUserResponseDto> toListMeetingUsersDto(List<UserMeeting> userMeetings) {
+        return userMeetings.stream()
+                .map(userMeeting -> MeetingUserResponseDto.builder()
+                        .userId(userMeeting.getUser().getId())
+                        .userName(userMeeting.getUser().getNickname())
+                        .userMeetingStatus(userMeeting.getStatus())
+                        .meetingId(userMeeting.getMeeting().getId())
+                        .build())
                 .toList();
     }
 }
