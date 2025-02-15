@@ -45,7 +45,7 @@ public class MeetingService {
 
     // 모임 생성
     @Transactional
-    public MeetingApplicationResponseDto create(MeetingRequestDto meetingRequestDto) {
+    public MeetingUserResponseDto create(MeetingRequestDto meetingRequestDto) {
         Place place = placeService.findOrCreatePlace(meetingRequestDto.getPlaceRequestDto());
         Meeting meeting = meetingMapper.toEntity(meetingRequestDto, place);
         meeting = meetingRepository.save(meeting);
@@ -55,7 +55,7 @@ public class MeetingService {
         User user = userService.getCurrentUser();
         UserMeeting userMeeting = userMeetingService.createUserMeeting(meeting, user, UserMeetingStatus.LEADER);
 
-        return meetingMapper.toApplicationDto(userMeeting);
+        return meetingMapper.toUserDto(userMeeting);
     }
 
     // 모임 상세 조회
@@ -66,7 +66,7 @@ public class MeetingService {
 
     // 모임 참가 신청
     @Transactional
-    public MeetingApplicationResponseDto applyMeetingByMeetingId(Long id) {
+    public MeetingUserResponseDto applyMeetingByMeetingId(Long id) {
         Meeting meeting = findProgressMeeting(id);
         User user = userService.getCurrentUser();
 
@@ -81,24 +81,24 @@ public class MeetingService {
 
         eventPublisher.publisher(new ApplyEvent(leader.getId(), user.getNickname(), user.getId(), meeting.getId(), meeting.getMeetingName()));
         redisService.incrementHotPlace(place.getId());
-        return meetingMapper.toApplicationDto(userMeeting);
+        return meetingMapper.toUserDto(userMeeting);
     }
 
     // 모임 참가 취소
     @Transactional
-    public MeetingApplicationResponseDto cancelMeetingApplication(Long id) {
+    public MeetingUserResponseDto cancelMeetingApplication(Long id) {
         Meeting meeting = findProgressMeeting(id);
         User user = userService.getCurrentUser();
 
         UserMeeting userMeeting = userMeetingService.updateMeetingStatus(meeting, user, UserMeetingStatus.CANCELLED);
         updateMeetingStatus(meeting);
 
-        return meetingMapper.toApplicationDto(userMeeting);
+        return meetingMapper.toUserDto(userMeeting);
     }
 
     // 모임 신청 상태 변경(모임 생성자)
     @Transactional
-    public MeetingApplicationResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingApplicationUpdateRequestDto dto) {
+    public MeetingUserResponseDto changeMeetingApplicationStatusByLeader(Long id, MeetingUserStatusUpdateRequestDto dto) {
         Meeting meeting = findProgressMeeting(id);
 
         userMeetingService.verifyLeaderPermission(meeting);
@@ -122,7 +122,7 @@ public class MeetingService {
         // LeaderAction 이벤트
         eventPublisher.publisher(new LeaderActionEvent(changeUser.getId(),meeting.getId(),meeting.getMeetingName(),leaderActionType));
 
-        return meetingMapper.toApplicationDto(userMeeting);
+        return meetingMapper.toUserDto(userMeeting);
     }
 
     private void updateMeetingStatus(Meeting meeting) {
@@ -130,21 +130,21 @@ public class MeetingService {
     }
 
     // 모임 신청자 조회
-    public List<MeetingApplicationResponseDto> readAllApplications(Long id) {
+    public List<MeetingUserResponseDto> readAllApplications(Long id) {
         Meeting meeting = findProgressMeeting(id);
 
         userMeetingService.verifyLeaderPermission(meeting);
 
         List<UserMeeting> userMeetings = userMeetingService.findWaitingByMeetingId(meeting);
-        return meetingMapper.toListApplicationDto(userMeetings);
+        return meetingMapper.toListUserDto(userMeetings);
 
     }
 
     // 모임 확정자 조회
-    public List<MeetingApplicationResponseDto> readAllConfirmed(Long id) {
+    public List<MeetingUserResponseDto> readAllConfirmed(Long id) {
         Meeting meeting = findProgressMeeting(id);
         List<UserMeeting> userMeetings = userMeetingService.findConfirmedByMeetingId(meeting);
-        return meetingMapper.toListApplicationDto(userMeetings);
+        return meetingMapper.toListUserDto(userMeetings);
     }
 
     // 장소별 모임 조회
@@ -186,7 +186,7 @@ public class MeetingService {
 
     // (모임 생성자) 모임 상태를 종료로 변경
     @Transactional
-    public List<MeetingUsersResponseDto> quitMeeting(Long id) {
+    public List<MeetingUserResponseDto> quitMeeting(Long id) {
         Meeting meeting = findProgressMeeting(id);
         userMeetingService.verifyLeaderPermission(meeting);
         meeting.updateMeetingStatus(MeetingStatus.CLOSED);
@@ -197,7 +197,7 @@ public class MeetingService {
 
     // (모임 생성자) 참석/불참 여부 변경
     @Transactional
-    public List<MeetingUsersResponseDto> checkAttendedOrAbsent(Long id, List<MeetingCheckUsersRequestDto> dtos) {
+    public List<MeetingUserResponseDto> checkAttendedOrAbsent(Long id, List<MeetingUserStatusUpdateRequestDto> dtos) {
         Meeting meeting = meetingRepository.findByIdAndStatus(id, MeetingStatus.CLOSED).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
         userMeetingService.verifyLeaderPermission(meeting);
 
