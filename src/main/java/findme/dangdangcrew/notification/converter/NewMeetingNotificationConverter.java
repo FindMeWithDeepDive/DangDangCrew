@@ -42,8 +42,8 @@ public class NewMeetingNotificationConverter implements NotificationConverter{
                 .message(newMeetingNotification.getMessage())
                 .isRead(newMeetingNotification.isRead())
                 .createdAt(newMeetingNotification.getCreatedAt())
-                .meetingId(newMeetingNotification.getMeetingId()) // 🔹 모임 ID 포함
-                .notificationType(newMeetingNotification.getNotificationType()) // 🔹 알림 타입 설정
+                .meetingId(newMeetingNotification.getMeetingId())
+                .notificationType(newMeetingNotification.getNotificationType())
                 .build();
     }
 

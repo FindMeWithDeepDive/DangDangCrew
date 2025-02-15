@@ -3,6 +3,8 @@ package findme.dangdangcrew.place.repository;
 import findme.dangdangcrew.place.domain.FavoritePlace;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +15,7 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     boolean existsByUserAndPlace(User user, Place place);
 
     @Query("SELECT fp FROM FavoritePlace fp JOIN FETCH fp.place WHERE fp.user = :user")
-    List<FavoritePlace> findAllByUser(@Param("user") User user);
+    Page<FavoritePlace> findAllByUser(@Param("user") User user, Pageable pageable);
 
     @Query("SELECT fp FROM FavoritePlace fp JOIN FETCH fp.user WHERE fp.place.id = :placeId")
     List<FavoritePlace> findAllByPlaceId(@Param("placeId") String placeId);
