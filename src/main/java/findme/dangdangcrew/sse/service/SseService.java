@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class SseService {
     private final EmitterRepository emitterRepository;
     private final ClockHolder clockHolder;
-    private static final long TIMEOUT = 120*1000L;
+    private static final long TIMEOUT = 1800*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
     // 알림을 저장하기 위한 연결된 userId 가져오는 로직
@@ -91,7 +91,7 @@ public class SseService {
 
     }
 
-    // 유저가 모임 참가 신청 할때 모임장이 받을 실시간 알림
+    // 유저가 모임 참가 신청 (모임장 알림) | 모임 참가 신청 결과 알림 (참가 신청 유저 알림)
     @Async
     public void sendNotificationToClient(Long userId, String message){
         SseEmitter sseEmitter = emitterRepository.findEmitterByUserId(userId);

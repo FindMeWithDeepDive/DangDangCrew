@@ -59,6 +59,9 @@ public enum ErrorCode {
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 리프레시 토큰입니다."),
     INVALID_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "잘못된 인증 정보입니다."),
 
+    // LeaderType Error
+    INVALID_LEADER_ACTION_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 LeaderActionType 입니다."),
+
     ;
 
     private final HttpStatus status;

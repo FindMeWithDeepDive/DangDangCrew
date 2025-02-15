@@ -13,6 +13,8 @@ import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.ApplyEvent;
+import findme.dangdangcrew.notification.event.LeaderActionEvent;
+import findme.dangdangcrew.notification.event.LeaderActionType;
 import findme.dangdangcrew.notification.event.NewMeetingEvent;
 import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.place.service.PlaceService;
@@ -101,13 +103,21 @@ public class MeetingService {
         UserMeetingStatus currentStatus = userMeeting.getStatus();
         UserMeetingStatus newStatus = dto.getStatus();
 
+        LeaderActionType leaderActionType = LeaderActionType.JOIN_REJECTED;
         if (currentStatus == UserMeetingStatus.WAITING && newStatus == UserMeetingStatus.CONFIRMED) {
             meeting.increaseCurPeople();
+            leaderActionType = LeaderActionType.JOIN_ACCEPTED;
         } else if (currentStatus == UserMeetingStatus.CONFIRMED && newStatus == UserMeetingStatus.CANCELLED) {
             meeting.decreaseCurPeople();
+            leaderActionType = LeaderActionType.KICK_OUT;
         }
+
         updateStatus(meeting);
         userMeeting = userMeetingService.updateMeetingStatus(meeting, changeUser, dto.getStatus());
+
+        // LeaderAction 이벤트
+        eventPublisher.publisher(new LeaderActionEvent(changeUser.getId(),meeting.getId(),meeting.getMeetingName(),leaderActionType));
+
         return meetingMapper.toApplicationDto(userMeeting);
     }
 
