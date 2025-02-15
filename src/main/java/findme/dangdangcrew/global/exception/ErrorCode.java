@@ -42,6 +42,7 @@ public enum ErrorCode {
     NOT_CHANGE(HttpStatus.BAD_REQUEST, "이전 상태와 동일합니다."),
     MEETING_USER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "해당 유저는 이 모임에 속해있지 않습니다."),
     MEETING_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "신청 내역이 존재합니다."),
+    MEETING_LEADER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 모임의 리더를 찾을 수 없습니다."),
 
     // Invalidation Error
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),

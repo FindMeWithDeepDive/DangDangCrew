@@ -24,24 +24,26 @@ public class UserMeetingService {
     private final UserMeetingRepository userMeetingRepository;
     private final UserService userService;
 
-    public UserMeeting findUserMeeting(Meeting meeting, User user) {
+    public UserMeeting getUserMeeting(Meeting meeting, User user) {
         return userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEETING_USER_NOT_EXISTS));
     }
 
-    // 리더 확인
-    public void checkLeaderPermission(Meeting meeting) {
-        User user = userService.getCurrentUser();
+    public List<UserMeeting> findConfirmedUsersByMeeting(Meeting meeting) {
+        return userMeetingRepository.findAllByStatusAndMeeting_Id(UserMeetingStatus.CONFIRMED, meeting.getId());
+    }
 
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if (userMeeting.getStatus() != UserMeetingStatus.LEADER) {
+    // 리더 확인
+    public void verifyLeaderPermission(Meeting meeting) {
+        User user = userService.getCurrentUser();
+        if (getUserMeeting(meeting, user).getStatus() != UserMeetingStatus.LEADER) {
             throw new CustomException(ErrorCode.NOT_LEADER);
         }
     }
 
     // 유저가 미팅에 참가
     @Transactional
-    public UserMeeting saveUserAndMeeting(Meeting meeting, User user, UserMeetingStatus status) {
+    public UserMeeting createUserMeeting(Meeting meeting, User user, UserMeetingStatus status) {
         UserMeeting userMeeting = UserMeeting.builder()
                 .meeting(meeting)
                 .user(user)
@@ -53,28 +55,22 @@ public class UserMeetingService {
 
     // 리더 찾기
     public User findLeader(Meeting meeting) {
-        UserMeeting userMeeting = userMeetingRepository.findFirstByStatusAndMeeting_Id(UserMeetingStatus.LEADER, meeting.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 모임의 리더를 찾을 수 없습니다."));
-        return userMeeting.getUser();
+        return userMeetingRepository.findFirstByStatusAndMeeting_Id(UserMeetingStatus.LEADER, meeting.getId())
+                .map(UserMeeting::getUser)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEETING_LEADER_NOT_FOUND));
     }
 
     @Transactional
     public UserMeeting updateMeetingStatus(Meeting meeting, User user, UserMeetingStatus newStatus) {
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if(userMeeting.getStatus() != newStatus) {
-            deductAvgScore(userMeeting, user);
-            userMeeting.updateStatus(newStatus);
-            return userMeeting;
-        } else {
+        UserMeeting userMeeting = getUserMeeting(meeting, user);
+        if(userMeeting.getStatus() == newStatus) {
             throw new CustomException(ErrorCode.NOT_CHANGE);
         }
-    }
-
-    @Transactional
-    protected void deductAvgScore(UserMeeting userMeeting, User user) {
         if(userMeeting.getStatus() == UserMeetingStatus.CONFIRMED) {
             user.deductUserScore();
         }
+        userMeeting.updateStatus(newStatus);
+        return userMeeting;
     }
 
     // 모임 신청자 전체 조회 - 모임 생성자
@@ -99,7 +95,7 @@ public class UserMeetingService {
     }
 
     // 기존 신청 여부 확인
-    public boolean findExistingUserMeeting(Meeting meeting, User user) {
+    public boolean isUserAlreadyInMeeting(Meeting meeting, User user) {
         Optional<UserMeeting> userMeeting = userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId());
         return userMeeting.isPresent();
     }
