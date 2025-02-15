@@ -91,9 +91,11 @@ public class UserMeetingService {
     }
 
     // 기존 신청 여부 확인
-    public boolean isUserAlreadyInMeeting(Meeting meeting, User user) {
+    public void isUserAlreadyInMeeting(Meeting meeting, User user) {
         Optional<UserMeeting> userMeeting = userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId());
-        return userMeeting.isPresent();
+        if (userMeeting.isPresent()) {
+            throw new CustomException(ErrorCode.MEETING_ALREADY_EXISTS);
+        }
     }
 
     // 스케줄링
