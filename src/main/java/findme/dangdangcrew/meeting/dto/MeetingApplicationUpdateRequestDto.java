@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class MeetingApplicationUpdateRequestDto {
     private Long userId;
 
