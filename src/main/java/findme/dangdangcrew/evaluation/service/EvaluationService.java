@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class EvaluationService {
-
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
 
@@ -24,6 +23,10 @@ public class EvaluationService {
 
     @Transactional
     public EvaluationCreateResponseDto createEvaluation(Long evaluatorId, EvaluationRequestDto requestDto) {
+        if (evaluatorId.equals(requestDto.getTargetUserId())) {
+            throw new IllegalArgumentException("자기 자신을 평가할 수 없습니다.");
+        }
+
         Evaluation evaluation = new Evaluation(
                 requestDto.getTargetUserId(),
                 evaluatorId,
