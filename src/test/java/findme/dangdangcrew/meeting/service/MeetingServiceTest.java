@@ -4,13 +4,12 @@ import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.publisher.EventPublisher;
+import findme.dangdangcrew.meeting.MeetingTestData;
 import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
 import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
 import findme.dangdangcrew.meeting.dto.MeetingUserResponseDto;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
-import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
-import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.NewMeetingEvent;
@@ -27,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -76,95 +74,14 @@ public class MeetingServiceTest {
 
     @BeforeEach
     void setup() {
-        user = createUser();
-        placeRequestDto = createPlaceRequestDto();
-        place = createPlace();
-        meetingRequestDto = createMeetingRequestDto();
-        meeting = createMeeting();
-        userMeeting = createUserMeeting();
-        meetingDetailResponseDto = createMeetingDetailResponseDto();
-        meetingUserResponseDto = createMeetingUserResponseDto(userMeeting);
-    }
-
-    private User createUser(){
-        return User.builder()
-                .email("bugak@email.com")
-                .name("이부각")
-                .nickname("뿌야")
-                .password("bugak123")
-                .phoneNumber("01012341234")
-                .build();
-    }
-
-    private Place createPlace(){
-        return Place.builder()
-                .id("217787831")
-                .placeName("원앤온리")
-                .x(126.319192490757)
-                .y(33.2392223486155)
-                .categoryGroupCode("CE7")
-                .categoryGroupName("카페")
-                .phone("064-794-0117")
-                .placeUrl("http://place.map.kakao.com/217787831")
-                .addressName("제주특별자치도 서귀포시 안덕면 사계리 86")
-                .roadAddressName("제주특별자치도 서귀포시 안덕면 산방로 141")
-                .build();
-    }
-
-    private PlaceRequestDto createPlaceRequestDto(){
-        return new PlaceRequestDto("217787831", "원앤온리", "126.319192490757", "33.2392223486155");
-    }
-
-    private Meeting createMeeting(){
-        return Meeting.builder()
-                .id(1L)
-                .meetingName("테스트용")
-                .information("테스트용 모임입니다.")
-                .maxPeople(5)
-                .curPeople(2)
-                .status(MeetingStatus.IN_PROGRESS)
-                .createdAt(LocalDateTime.now())
-                .place(place)
-                .build();
-    }
-
-    private UserMeeting createUserMeeting(){
-        return UserMeeting.builder()
-                .id(1L)
-                .user(user)
-                .meeting(meeting)
-                .status(UserMeetingStatus.LEADER)
-                .build();
-    }
-
-    private MeetingRequestDto createMeetingRequestDto(){
-        return MeetingRequestDto.builder()
-                .meetingName("테스트용")
-                .information("테스트용 모임입니다.")
-                .maxPeople(5)
-                .placeRequestDto(placeRequestDto)
-                .build();
-    }
-
-    private MeetingDetailResponseDto createMeetingDetailResponseDto(){
-        return MeetingDetailResponseDto.builder()
-                .meetingId(1L)
-                .meetingName("테스트용")
-                .information("테스트용 모임입니다.")
-                .maxPeople(5)
-                .curPeople(2)
-                .status(MeetingStatus.IN_PROGRESS)
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
-
-    private MeetingUserResponseDto createMeetingUserResponseDto(UserMeeting userMeeting) {
-        return MeetingUserResponseDto.builder()
-                .userId(userMeeting.getUser().getId())
-                .userName(userMeeting.getUser().getNickname())
-                .meetingId(userMeeting.getMeeting().getId())
-                .userMeetingStatus(userMeeting.getStatus())
-                .build();
+        user = MeetingTestData.createUser();
+        placeRequestDto = MeetingTestData.createPlaceRequestDto();
+        place = MeetingTestData.createPlace();
+        meetingRequestDto = MeetingTestData.createMeetingRequestDto(placeRequestDto);
+        meeting = MeetingTestData.createMeeting(place);
+        userMeeting = MeetingTestData.createUserMeeting(user, meeting);
+        meetingDetailResponseDto = MeetingTestData.createMeetingDetailResponseDto();
+        meetingUserResponseDto = MeetingTestData.createMeetingUserResponseDto(userMeeting);
     }
 
     @Test
