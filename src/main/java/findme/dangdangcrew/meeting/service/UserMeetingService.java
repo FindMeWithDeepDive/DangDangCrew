@@ -112,7 +112,7 @@ public class UserMeetingService {
     }
 
     // 스케줄링
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void deleteCancelledApplications(){
         log.info("취소된 모임 신청 내역 삭제");
