@@ -1,7 +1,7 @@
 package findme.dangdangcrew.chat.service;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
-import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
+import findme.dangdangcrew.chat.dto.ChatMessageResponseDto;
 import findme.dangdangcrew.chat.entity.ChatParticipant;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatParticipantRepository;
@@ -11,6 +11,9 @@ import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,31 +28,47 @@ public class ChatRoomService {
     private final UserService userService;
     private final ChatParticipantRepository chatParticipantRepository;
 
-    public String processChat(ChatMessageRequestDto chatMessage, Long roomId, Long userId) {
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public ChatMessageResponseDto processChat(ChatMessageRequestDto chatMessage, Long roomId,
+                                              Map<String, Object> sessionAttributes) {
+        Long userId = (Long) sessionAttributes.get("userId");
+        if (userId == null) {
+            throw new CustomException(ErrorCode.NULL_POINT);
+        }
+        User user = userService.getUser(userId);
+
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.ENTER) {
-            enterRoom(roomId, userId);
-            return chatMessage.getSender() + "님이 입장하셨습니다.";
+            enterRoom(roomId, user);
+            return toResponse(roomId, user, user.getNickname() + "님이 입장하셨습니다.");
         }
         if (chatMessage.getType() == ChatMessageRequestDto.MessageType.LEAVE) {
-            leaveRoom(roomId, userId);
-            return chatMessage.getSender() + "님이 퇴장하셨습니다.";
+            leaveRoom(roomId, user);
+            return toResponse(roomId, user, user.getNickname() + "님이 퇴장하셨습니다.");
         }
-        chatMessageService.saveMessage(chatMessage, roomId);
-        return chatMessage.getMessage();
+        chatMessageService.saveMessage(chatMessage, roomId, user);
+        return toResponse(roomId, user, chatMessage.getMessage());
     }
 
-    public void enterRoom(Long roomId, Long userId) {
+    private ChatMessageResponseDto toResponse(Long roomId, User user, String message) {
+        return ChatMessageResponseDto.builder()
+            .roomId(String.valueOf(roomId))
+            .sender(user.getNickname())
+            .message(message)
+            .timestamp(LocalDateTime.now().format(formatter))
+            .build();
+    }
+
+    public void enterRoom(Long roomId, User user) {
         ChatRoom chatRoom = getChatRoom(roomId);
-        User user = userService.getUser(userId);
         checkIfAlreadyJoined(chatRoom, user);
 
         saveChatParticipant(chatRoom, user);
         chatRoom.addParticipant();
     }
 
-    public void leaveRoom(Long roomId, Long userId) {
+    public void leaveRoom(Long roomId, User user) {
         ChatRoom chatRoom = getChatRoom(roomId);
-        User user = userService.getUser(userId);
         checkIfAlreadyLeft(chatRoom, user);
 
         chatParticipantRepository.deleteByChatRoomAndUser(chatRoom, user);
