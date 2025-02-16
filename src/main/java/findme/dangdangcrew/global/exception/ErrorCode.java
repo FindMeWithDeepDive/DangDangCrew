@@ -40,6 +40,11 @@ public enum ErrorCode {
     MEETING_INSUFFICIENT_PEOPLE(HttpStatus.BAD_REQUEST, "현재 인원은 1명 미만이 될 수 없습니다."),
     NOT_LEADER(HttpStatus.BAD_REQUEST, "현재 로그인한 유저는 리더가 아닙니다."),
     NOT_CHANGE(HttpStatus.BAD_REQUEST, "이전 상태와 동일합니다."),
+    MEETING_USER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "해당 유저는 이 모임에 속해있지 않습니다."),
+    MEETING_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "신청 내역이 존재합니다."),
+    MEETING_LEADER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 모임의 리더를 찾을 수 없습니다."),
+    INVALID_MEETING_CAPACITY(HttpStatus.BAD_REQUEST, "모임의 인원은 최소 2명, 최대 10명이어야 합니다."),
+    LEADER_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, "리더는 참가 취소를 할 수 없습니다."),
 
     // Invalidation Error
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),

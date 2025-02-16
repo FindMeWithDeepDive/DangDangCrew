@@ -42,22 +42,32 @@ public class MeetingMapper {
                             .maxPeople(meeting.getMaxPeople())
                             .curPeople(meeting.getCurPeople())
                             .status(meeting.getStatus())
+                            .createdAt(meeting.getCreatedAt())
                             .build())
             .toList();
     }
 
-    public MeetingApplicationResponseDto toApplicationDto(UserMeeting userMeeting) {
-        return MeetingApplicationResponseDto.builder()
+    public MeetingUserResponseDto toUserDto(UserMeeting userMeeting) {
+        return MeetingUserResponseDto.builder()
                 .meetingId(userMeeting.getMeeting().getId())
                 .userId(userMeeting.getUser().getId())
                 .userName(userMeeting.getUser().getName())
-                .status(userMeeting.getStatus())
+                .userMeetingStatus(userMeeting.getStatus())
                 .build();
     }
 
-    public List<MeetingApplicationResponseDto> toListApplicationDto(List<UserMeeting> userMeetings) {
+    public List<MeetingUserResponseDto> toListUserDto(List<UserMeeting> userMeetings) {
+        return userMeetings.stream().map(this::toUserDto).toList();
+    }
+
+    public List<MeetingUserResponseDto> toListMeetingUsersDto(List<UserMeeting> userMeetings) {
         return userMeetings.stream()
-                .map(this::toApplicationDto)
+                .map(userMeeting -> MeetingUserResponseDto.builder()
+                        .userId(userMeeting.getUser().getId())
+                        .userName(userMeeting.getUser().getNickname())
+                        .userMeetingStatus(userMeeting.getStatus())
+                        .meetingId(userMeeting.getMeeting().getId())
+                        .build())
                 .toList();
     }
 }
