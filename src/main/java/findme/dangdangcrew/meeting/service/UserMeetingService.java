@@ -9,6 +9,7 @@ import findme.dangdangcrew.meeting.repository.UserMeetingRepository;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Log4j2
 public class UserMeetingService {
 
     private final UserMeetingRepository userMeetingRepository;
@@ -110,9 +112,10 @@ public class UserMeetingService {
     }
 
     // 스케줄링
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     @Transactional
     public void deleteCancelledApplications(){
+        log.info("취소된 모임 신청 내역 삭제");
         userMeetingRepository.deleteAllByStatus(UserMeetingStatus.CANCELLED);
     }
 }
