@@ -215,7 +215,7 @@ public class MeetingServiceTest {
     }
 
     @Test
-    @DisplayName("[❌ 모임 조회 실패] 존재하지 않는 모임 조회 시 예외를 발생시킵니다.")
+    @DisplayName("[❌ 모임 조회] 존재하지 않는 모임 조회 시 예외를 발생시킵니다.")
     void readByMeetingId_NotFound() {
         Long nonExistingMeetingId = 999L;
         when(meetingRepository.findByIdAndStatusIn(eq(nonExistingMeetingId), any()))
