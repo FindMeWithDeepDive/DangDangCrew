@@ -75,4 +75,17 @@ public class ChatRoomServiceTest {
         assertThat(chatRoom.getCurrentParticipants()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("채팅방에 이미 입장한 경우 입장에 실패한다.")
+    void enterChatRoom_Fail() {
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
+        when(chatParticipantRepository.findByChatRoomAndUser(chatRoom, user)).thenReturn(Optional.of(ChatParticipant.builder()
+                .chatRoom(chatRoom)
+                .user(user)
+                .build()));
+
+        assertThatThrownBy(() -> chatRoomService.enterRoom(1L, user))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.ALREADY_JOINED.getMessage());
+    }
 }
