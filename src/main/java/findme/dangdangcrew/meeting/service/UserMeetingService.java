@@ -9,37 +9,50 @@ import findme.dangdangcrew.meeting.repository.UserMeetingRepository;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Log4j2
 public class UserMeetingService {
 
     private final UserMeetingRepository userMeetingRepository;
     private final UserService userService;
 
-    public UserMeeting findUserMeeting(Meeting meeting, User user) {
+    public UserMeeting getUserMeeting(Meeting meeting, User user) {
         return userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 이 모임에 속해있지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEETING_USER_NOT_EXISTS));
+    }
+
+    public List<UserMeeting> findUserMeetingsByMeetingAndUserIds(Meeting meeting, List<Long> userIds) {
+        return userMeetingRepository.findAllByMeeting_IdAndUser_IdIn(meeting.getId(), userIds);
     }
 
     // 리더 확인
-    public void checkLeaderPermission(Meeting meeting) {
+    public void verifyLeaderPermission(Meeting meeting) {
         User user = userService.getCurrentUser();
-
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if (userMeeting.getStatus() != UserMeetingStatus.LEADER) {
+        if (getUserMeeting(meeting, user).getStatus() != UserMeetingStatus.LEADER) {
             throw new CustomException(ErrorCode.NOT_LEADER);
+        }
+    }
+
+    // 일반 유저 확인
+    public void verifyUser(Meeting meeting, User user) {
+        if(getUserMeeting(meeting, user).getStatus() == UserMeetingStatus.LEADER){
+            throw new CustomException(ErrorCode.LEADER_CANNOT_CANCEL);
         }
     }
 
     // 유저가 미팅에 참가
     @Transactional
-    public UserMeeting saveUserAndMeeting(Meeting meeting, User user, UserMeetingStatus status) {
+    public UserMeeting createUserMeeting(Meeting meeting, User user, UserMeetingStatus status) {
         UserMeeting userMeeting = UserMeeting.builder()
                 .meeting(meeting)
                 .user(user)
@@ -51,28 +64,22 @@ public class UserMeetingService {
 
     // 리더 찾기
     public User findLeader(Meeting meeting) {
-        UserMeeting userMeeting = userMeetingRepository.findFirstByStatusAndMeeting_Id(UserMeetingStatus.LEADER, meeting.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 모임의 리더를 찾을 수 없습니다."));
-        return userMeeting.getUser();
+        return userMeetingRepository.findFirstByStatusAndMeeting_Id(UserMeetingStatus.LEADER, meeting.getId())
+                .map(UserMeeting::getUser)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEETING_LEADER_NOT_FOUND));
     }
 
     @Transactional
     public UserMeeting updateMeetingStatus(Meeting meeting, User user, UserMeetingStatus newStatus) {
-        UserMeeting userMeeting = findUserMeeting(meeting, user);
-        if(userMeeting.getStatus() != newStatus) {
-            deductAvgScore(userMeeting, user);
-            userMeeting.updateStatus(newStatus);
-            return userMeeting;
-        } else {
+        UserMeeting userMeeting = getUserMeeting(meeting, user);
+        if(userMeeting.getStatus() == newStatus) {
             throw new CustomException(ErrorCode.NOT_CHANGE);
         }
-    }
-
-    @Transactional
-    protected void deductAvgScore(UserMeeting userMeeting, User user) {
         if(userMeeting.getStatus() == UserMeetingStatus.CONFIRMED) {
             user.deductUserScore();
         }
+        userMeeting.updateStatus(newStatus);
+        return userMeeting;
     }
 
     // 모임 신청자 전체 조회 - 모임 생성자
@@ -90,5 +97,25 @@ public class UserMeetingService {
     public void delete(Meeting meeting) {
         List<UserMeeting> userMeetings = userMeetingRepository.findAllByMeeting_Id(meeting.getId());
         userMeetings.forEach(userMeeting -> userMeeting.updateStatus(UserMeetingStatus.REMOVED));
+    }
+
+    public List<UserMeeting> findUserMeetingByUser(User user){
+        return userMeetingRepository.findAllByUser_Id(user.getId());
+    }
+
+    // 기존 신청 여부 확인
+    public void isUserAlreadyInMeeting(Meeting meeting, User user) {
+        Optional<UserMeeting> userMeeting = userMeetingRepository.findFirstByMeeting_IdAndUser_Id(meeting.getId(), user.getId());
+        if (userMeeting.isPresent()) {
+            throw new CustomException(ErrorCode.MEETING_ALREADY_EXISTS);
+        }
+    }
+
+    // 스케줄링
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void deleteCancelledApplications(){
+        log.info("취소된 모임 신청 내역 삭제");
+        userMeetingRepository.deleteAllByStatus(UserMeetingStatus.CANCELLED);
     }
 }
