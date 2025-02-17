@@ -148,7 +148,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 신청 유저 확정/취소 성공")
+    @DisplayName("[✅유저 확정/취소] 유저의 모임 참가 상태를 확정/취소로 성공적으로 변경합니다.")
     void createMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -166,7 +166,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("신청 유저 확정/취소 실패 - 리더아님")
+    @DisplayName("[❌유저 확정/취소] 리더가 아닌 유저가 유저의 상태를 변경하고자 하는 경우 예외를 발생시킵니다.")
     void createMeeting_NotLeader_Fail() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -183,7 +183,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("신청 유저 확정/취소 실패 - 같은 상태")
+    @DisplayName("[❌유저 확정/취소 실패] 변경하고자 하는 상태가 이전과 동일할 경우 예외를 발생시킵니다.")
     void createMeeting_NotChangeStatus_Fail() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -200,7 +200,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 신청자 조회 - 성공")
+    @DisplayName("[✅모임 신청자 조회] 리더가 모임 신청자를 성공적으로 조회합니다.")
     void getMeetingDetail_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -213,7 +213,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 신청자 조회 - 리더아님")
+    @DisplayName("[❌모임 신청자 조회] 리더가 아닌 유저가 모임 신청자 조회를 할 경우 예외를 발생시킵니다.")
     void getMeetingDetail_NotLeader_Fail() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -225,7 +225,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 신청 유저 확정/취소 성공")
+    @DisplayName("[✅모임 수정] 리더가 모임 수정을 성공적으로 처리합니다.")
     void updateMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -245,7 +245,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 신청자 조회 - 리더아님")
+    @DisplayName("[❌모임 수정] 리더가 아닌 유저가 모임을 수정하고자 하는 경우 예외를 발생시킵니다.")
     void updateMeeting_NotLeader_Fail() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -264,7 +264,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 삭제 - 성공")
+    @DisplayName("[✅모임 삭제] 리더가 모임을 성공적으로 삭제합니다.")
     void deleteMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -276,7 +276,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 삭제 실패 - 존재하지 않는 모임")
+    @DisplayName("[❌모임 삭제] 존재하지 않는 모임을 삭제하고자 하는 경우 예외를 발생시킵니다.")
     void deleteMeeting_MeetingNotFound_Fail() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -288,7 +288,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 종료 - 성공")
+    @DisplayName("[✅모임 종료] 리더가 모임 상태를 종료로 변경합니다.")
     void quitMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -307,7 +307,7 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 참석 여부 변경 - 성공")
+    @DisplayName("[✅모임 참석 여부 변경] 리더가 유저들의 참석여부를 성공적으로 변경합니다.")
     void checkUserMeetingStatus_Success() throws Exception {
         String token = generateTestToken(testLeader);
 

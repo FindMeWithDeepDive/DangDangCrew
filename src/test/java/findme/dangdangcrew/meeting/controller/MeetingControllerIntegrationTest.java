@@ -136,7 +136,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 생성 - 성공")
+    @DisplayName("[✅모임 생성] 모임 생성을 성공적으로 처리합니다.")
     void createMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -156,7 +156,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 상세 조회 - 성공")
+    @DisplayName("[✅모임 상세 조회] 모임 상세 조회를 성공적으로 처리합니다.")
     void getMeetingDetail_Success() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -169,7 +169,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 상세 조회 실패 - 모임을 찾을 수 없음")
+    @DisplayName("[❌모임 상세 조회] 해당 모임을 찾을 수 없는 경우 예외를 발생 시킵니다.")
     void getMeetingDetail_MeetingNotFound_Fail() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -181,7 +181,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 장소별 모임 조회 - 성공")
+    @DisplayName("[✅장소별 모임 조회] 장소별 모임 조회를 성공적으로 처리합니다.")
     void getAllMeetingsByPlaceId_Success() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -195,7 +195,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 참가 신청 성공")
+    @DisplayName("[✅모임 참가 신청] 모임 참가 신청을 성공적으로 처리합니다.")
     void applyMeeting_Success() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -208,7 +208,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 참가 신청 실패 - 이미 신청내역이 존재")
+    @DisplayName("[❌모임 참가 신청 실패] 이미 신청 내역이 존재하여 모임 참가 신청시 예외를 발생시킵니다.")
     void applyMeeting_ApplicationsAlreadyExists_Fail() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -226,7 +226,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 참가 취소 성공")
+    @DisplayName("[✅모임 참가 취소 성공] 모임 참가 취소를 성공적으로 처리합니다.")
     void cancelMeeting_Success() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -245,7 +245,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 참가 취소 실패 - 리더는 취소할 수 없음")
+    @DisplayName("[❌모임 참가 취소 실패] 리더는 모임 참가 취소를 할 수 없어 예외를 발생 시킵니다.")
     void cancelMeeting_LeaderCannotCancel_Fail() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -257,7 +257,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("모임 참가 취소 실패 - 해당 모임을 찾을 수 없음")
+    @DisplayName("[❌모임 참가 취소 실패] 해당 모임을 찾을 수 없어 예외를 발생시킵니다.")
     void cancelMeeting_MeetingNotFound_Fail() throws Exception {
         String token = generateTestToken(testLeader);
 
@@ -269,7 +269,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 모임 확정자 조회 - 성공")
+    @DisplayName("[✅모임 확정자 조회] 모임 확정자 조회를 성공적으로 처리합니다.")
     void getConfirmedMeetingApplications_Success() throws Exception {
         String token = generateTestToken(testUser);
 
@@ -288,7 +288,7 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("✅ 내 모임 조회 - 성공")
+    @DisplayName("[✅내 모임 조회] 내 모임 조회를 성공적으로 처리합니다.")
     void getMeetingsByUser_Success() throws Exception {
         String token = generateTestToken(testUser);
 
