@@ -82,10 +82,11 @@ public class ChatRoomServiceTest {
     @DisplayName("채팅방에 이미 입장한 경우 입장에 실패한다.")
     void enterChatRoom_Fail() {
         when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
-        when(chatParticipantRepository.findByChatRoomAndUser(chatRoom, user)).thenReturn(Optional.of(ChatParticipant.builder()
-                .chatRoom(chatRoom)
-                .user(user)
-                .build()));
+        when(chatParticipantRepository.findByChatRoomAndUser(chatRoom, user)).thenReturn(
+                Optional.of(ChatParticipant.builder()
+                        .chatRoom(chatRoom)
+                        .user(user)
+                        .build()));
 
         assertThatThrownBy(() -> chatRoomService.enterRoom(1L, user))
                 .isInstanceOf(CustomException.class)
@@ -115,4 +116,16 @@ public class ChatRoomServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.ALREADY_LEFT.getMessage());
     }
+
+    @Test
+    @DisplayName("존재하지 않는 채팅방에는 입장에 실패한다.")
+    void enterChatRoom_NotExist() {
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatRoomService.enterRoom(1L, user))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.CHAT_ROOM_NOT_FOUND.getMessage());
+    }
+
+
 }
