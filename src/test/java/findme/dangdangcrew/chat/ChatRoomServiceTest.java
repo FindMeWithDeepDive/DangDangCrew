@@ -127,5 +127,13 @@ public class ChatRoomServiceTest {
                 .hasMessage(ErrorCode.CHAT_ROOM_NOT_FOUND.getMessage());
     }
 
+    @Test
+    @DisplayName("존재하지 않는 채팅방에서 퇴장에 실패한다.")
+    void leaveChatRoom_NotExist() {
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.empty());
 
+        assertThatThrownBy(() -> chatRoomService.leaveRoom(1L, user))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.CHAT_ROOM_NOT_FOUND.getMessage());
+    }
 }
