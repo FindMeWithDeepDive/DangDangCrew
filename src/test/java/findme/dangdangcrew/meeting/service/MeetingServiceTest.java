@@ -105,8 +105,8 @@ public class MeetingServiceTest {
     }
 
     @Test
-    @DisplayName("[❌ 모임 생성] 최대 인원 초과로 인해 모임 생성에 실패합니다.")
-    void createMeeting_InvalidMaxPeople() {
+    @DisplayName("[❌모임 생성] 최대 인원 초과로 인해 모임 생성에 실패합니다.")
+    void createMeeting_InvalidMaxPeople_Fail() {
         meetingRequestDto = MeetingRequestDto.builder()
                 .meetingName("잘못된 모임")
                 .information("테스트")
@@ -121,7 +121,7 @@ public class MeetingServiceTest {
     }
 
     @Test
-    @DisplayName("[✅ 모임 조회] 모임 상세 정보를 정상적으로 조회합니다.")
+    @DisplayName("[✅모임 조회] 모임 상세 정보를 정상적으로 조회합니다.")
     void readByMeetingId_Success() {
         when(meetingRepository.findByIdAndStatusIn(eq(meeting.getId()), any())).thenReturn(Optional.of(meeting));
         when(meetingMapper.toDto(any())).thenReturn(meetingDetailResponseDto);
@@ -132,8 +132,8 @@ public class MeetingServiceTest {
     }
 
     @Test
-    @DisplayName("[❌ 모임 조회] 존재하지 않는 모임 조회 시 예외를 발생시킵니다.")
-    void readByMeetingId_NotFound() {
+    @DisplayName("[❌모임 조회] 존재하지 않는 모임 조회 시 예외를 발생시킵니다.")
+    void readByMeetingId_NotFound_Fail() {
         Long nonExistingMeetingId = 999L;
         when(meetingRepository.findByIdAndStatusIn(eq(nonExistingMeetingId), any()))
                 .thenReturn(Optional.empty());
