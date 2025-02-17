@@ -1,15 +1,19 @@
 package findme.dangdangcrew.chat;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto;
 import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
+import findme.dangdangcrew.chat.dto.ChatMessageResponseDto;
 import findme.dangdangcrew.chat.entity.ChatMessage;
 import findme.dangdangcrew.chat.repository.ChatMessageRepository;
 import findme.dangdangcrew.chat.service.ChatMessageService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,5 +75,24 @@ public class ChatMessageServiceTest {
         chatMessageService.saveMessage(requestDto, 1L, user);
 
         verify(chatMessageRepository).save(any(ChatMessage.class));
+    }
+
+    @Test
+    @DisplayName("채팅 메시지 불러오기에 성공한다.")
+    void getMessages_Success() {
+        List<ChatMessage> messages = List.of(
+                ChatMessage.create(1L, "user1", "첫 번째 메시지"),
+                ChatMessage.create(1L, "user2", "두 번째 메시지")
+        );
+
+        when(chatMessageRepository.findByRoomIdOrderByTimeAsc(1L)).thenReturn(messages);
+
+        List<ChatMessageResponseDto> result = chatMessageService.getMessages(1L);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getSender()).isEqualTo("user1");
+        assertThat(result.get(0).getMessage()).isEqualTo("첫 번째 메시지");
+        assertThat(result.get(1).getSender()).isEqualTo("user2");
+        assertThat(result.get(1).getMessage()).isEqualTo("두 번째 메시지");
     }
 }
