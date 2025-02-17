@@ -169,6 +169,18 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("모임 상세 조회 실패 - 모임을 찾을 수 없음")
+    void getMeetingDetail_MeetingNotFound_Fail() throws Exception {
+        String token = generateTestToken(testUser);
+
+        mockMvc.perform(get("/api/v1/meetings/{meetingId}", 1231232)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("해당 미팅을 찾을 수  없습니다."));
+    }
+
+    @Test
     @DisplayName("✅ 장소별 모임 조회 - 성공")
     void getAllMeetingsByPlaceId_Success() throws Exception {
         String token = generateTestToken(testUser);
@@ -196,6 +208,24 @@ class MeetingControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("모임 참가 신청 실패 - 이미 신청내역이 존재")
+    void applyMeeting_ApplicationsAlreadyExists_Fail() throws Exception {
+        String token = generateTestToken(testUser);
+
+        testUserMeeting = userMeetingRepository.saveAndFlush(UserMeeting.builder()
+                .meeting(testMeeting)
+                .user(testUser)
+                .status(UserMeetingStatus.CANCELLED)
+                .build());
+
+        mockMvc.perform(post("/api/v1/meetings/{meetingId}/applications", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("신청 내역이 존재합니다."));
+    }
+
+    @Test
     @DisplayName("모임 참가 취소 성공")
     void cancelMeeting_Success() throws Exception {
         String token = generateTestToken(testUser);
@@ -212,6 +242,30 @@ class MeetingControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("모임 참가를 성공적으로 취소하였습니다."))
                 .andExpect(jsonPath("$.data.meetingId").value(testMeeting.getId()));
+    }
+
+    @Test
+    @DisplayName("모임 참가 취소 실패 - 리더는 취소할 수 없음")
+    void cancelMeeting_LeaderCannotCancel_Fail() throws Exception {
+        String token = generateTestToken(testLeader);
+
+        mockMvc.perform(patch("/api/v1/meetings/{meetingId}/applications", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("리더는 참가 취소를 할 수 없습니다."));
+    }
+
+    @Test
+    @DisplayName("모임 참가 취소 실패 - 해당 모임을 찾을 수 없음")
+    void cancelMeeting_MeetingNotFound_Fail() throws Exception {
+        String token = generateTestToken(testLeader);
+
+        mockMvc.perform(patch("/api/v1/meetings/{meetingId}/applications", 1231232)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("해당 미팅을 찾을 수  없습니다."));
     }
 
     @Test

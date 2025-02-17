@@ -166,6 +166,40 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("신청 유저 확정/취소 실패 - 리더아님")
+    void createMeeting_NotLeader_Fail() throws Exception {
+        String token = generateTestToken(testUser);
+
+        MeetingUserStatusUpdateRequestDto requestDto = new MeetingUserStatusUpdateRequestDto();
+        ReflectionTestUtils.setField(requestDto, "userId", testUser.getId());
+        ReflectionTestUtils.setField(requestDto, "status", UserMeetingStatus.CONFIRMED);
+
+        mockMvc.perform(put("/api/v1/meetings/leader/{meetingId}/applications", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("현재 로그인한 유저는 리더가 아닙니다."));
+    }
+
+    @Test
+    @DisplayName("신청 유저 확정/취소 실패 - 같은 상태")
+    void createMeeting_NotChangeStatus_Fail() throws Exception {
+        String token = generateTestToken(testLeader);
+
+        MeetingUserStatusUpdateRequestDto requestDto = new MeetingUserStatusUpdateRequestDto();
+        ReflectionTestUtils.setField(requestDto, "userId", testUser.getId());
+        ReflectionTestUtils.setField(requestDto, "status", UserMeetingStatus.WAITING);
+
+        mockMvc.perform(put("/api/v1/meetings/leader/{meetingId}/applications", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("이전 상태와 동일합니다."));
+    }
+
+    @Test
     @DisplayName("✅ 모임 신청자 조회 - 성공")
     void getMeetingDetail_Success() throws Exception {
         String token = generateTestToken(testLeader);
@@ -179,10 +213,21 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("모임 신청자 조회 - 리더아님")
+    void getMeetingDetail_NotLeader_Fail() throws Exception {
+        String token = generateTestToken(testUser);
+
+        mockMvc.perform(get("/api/v1/meetings/leader/{meetingId}/applications", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("현재 로그인한 유저는 리더가 아닙니다."));
+    }
+
+    @Test
     @DisplayName("✅ 신청 유저 확정/취소 성공")
     void updateMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
-
 
         MeetingRequestDto requestDto = new MeetingRequestDto();
         ReflectionTestUtils.setField(requestDto, "meetingName", "수정");
@@ -200,6 +245,25 @@ public class MeetingLeaderControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("모임 신청자 조회 - 리더아님")
+    void updateMeeting_NotLeader_Fail() throws Exception {
+        String token = generateTestToken(testUser);
+
+        MeetingRequestDto requestDto = new MeetingRequestDto();
+        ReflectionTestUtils.setField(requestDto, "meetingName", "수정");
+        ReflectionTestUtils.setField(requestDto, "information", "수정합니덩");
+        ReflectionTestUtils.setField(requestDto, "maxPeople", 6);
+        ReflectionTestUtils.setField(requestDto, "placeRequestDto", new PlaceRequestDto("217787831", "원앤온리", "126.319192490757", "33.2392223486155"));
+
+        mockMvc.perform(put("/api/v1/meetings/leader/{meetingId}", testMeeting.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("현재 로그인한 유저는 리더가 아닙니다."));
+    }
+
+    @Test
     @DisplayName("✅ 모임 삭제 - 성공")
     void deleteMeeting_Success() throws Exception {
         String token = generateTestToken(testLeader);
@@ -209,6 +273,18 @@ public class MeetingLeaderControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("모임 삭제를 성공적으로 완료하였습니다."));
+    }
+
+    @Test
+    @DisplayName("모임 삭제 실패 - 존재하지 않는 모임")
+    void deleteMeeting_MeetingNotFound_Fail() throws Exception {
+        String token = generateTestToken(testLeader);
+
+        mockMvc.perform(patch("/api/v1/meetings/leader/{meetingId}/cancel", 1231312)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("해당 미팅을 찾을 수  없습니다."));
     }
 
     @Test
