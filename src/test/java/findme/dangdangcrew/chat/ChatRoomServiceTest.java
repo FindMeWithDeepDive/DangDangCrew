@@ -17,7 +17,6 @@ import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
 import findme.dangdangcrew.user.entity.User;
-import findme.dangdangcrew.user.service.UserService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +37,6 @@ public class ChatRoomServiceTest {
 
     @Mock
     private ChatParticipantRepository chatParticipantRepository;
-
-    @Mock
-    private UserService userService;
 
     private User user;
     private ChatRoom chatRoom;
