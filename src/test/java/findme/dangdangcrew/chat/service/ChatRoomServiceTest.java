@@ -1,4 +1,4 @@
-package findme.dangdangcrew.chat;
+package findme.dangdangcrew.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,7 +11,6 @@ import findme.dangdangcrew.chat.entity.ChatParticipant;
 import findme.dangdangcrew.chat.entity.ChatRoom;
 import findme.dangdangcrew.chat.repository.ChatParticipantRepository;
 import findme.dangdangcrew.chat.repository.ChatRoomRepository;
-import findme.dangdangcrew.chat.service.ChatRoomService;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.meeting.entity.Meeting;

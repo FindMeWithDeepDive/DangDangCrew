@@ -1,4 +1,4 @@
-package findme.dangdangcrew.chat;
+package findme.dangdangcrew.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,11 +10,8 @@ import findme.dangdangcrew.chat.dto.ChatMessageRequestDto.MessageType;
 import findme.dangdangcrew.chat.dto.ChatMessageResponseDto;
 import findme.dangdangcrew.chat.entity.ChatMessage;
 import findme.dangdangcrew.chat.repository.ChatMessageRepository;
-import findme.dangdangcrew.chat.service.ChatMessageService;
 import findme.dangdangcrew.user.entity.User;
-import findme.dangdangcrew.user.service.UserService;
 import java.util.List;
-import net.bytebuddy.build.ToStringPlugin.Enhance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
