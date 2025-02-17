@@ -32,6 +32,7 @@ public class SwaggerConfig {
     private List<Server> servers() {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server().url("http://localhost:8080").description("Local URL"));
+        servers.add(new Server().url("http://54.180.30.146/:8080").description("prod URL"));
         return servers;
     }
 
