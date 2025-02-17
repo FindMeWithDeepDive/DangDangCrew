@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 
 public class MeetingTestData {
 
-    /** ✅ 공통 User 생성 */
     public static User createUser() {
         User user = User.builder()
                 .email("bugak@email.com")
@@ -39,7 +38,6 @@ public class MeetingTestData {
         return user;
     }
 
-    /** ✅ 공통 Place 생성 */
     public static Place createPlace() {
         return Place.builder()
                 .id("217787831")
