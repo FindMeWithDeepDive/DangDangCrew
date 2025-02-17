@@ -2,6 +2,9 @@ package findme.dangdangcrew.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import findme.dangdangcrew.chat.entity.ChatParticipant;
@@ -88,4 +91,17 @@ public class ChatRoomServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.ALREADY_JOINED.getMessage());
     }
+
+    @Test
+    @DisplayName("채팅방에 퇴장에 성공한다.")
+    void leaveChatRoom_Success() {
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
+        when(chatParticipantRepository.findByChatRoomAndUser(any(ChatRoom.class), any(User.class)))
+                .thenReturn(Optional.of(new ChatParticipant(chatRoom, user)));
+
+        chatRoomService.leaveRoom(1L, user);
+
+        verify(chatParticipantRepository, times(1)).deleteByChatRoomAndUser(chatRoom, user);
+    }
+
 }
