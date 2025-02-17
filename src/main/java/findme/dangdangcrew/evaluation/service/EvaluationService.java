@@ -3,7 +3,10 @@ package findme.dangdangcrew.evaluation.service;
 import findme.dangdangcrew.evaluation.dto.*;
 import findme.dangdangcrew.evaluation.entity.Evaluation;
 import findme.dangdangcrew.evaluation.repository.EvaluationRepository;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.user.repository.UserRepository;
+import findme.dangdangcrew.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +18,20 @@ import java.util.stream.Collectors;
 public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public EvaluationService(EvaluationRepository evaluationRepository, UserRepository userRepository) {
+    public EvaluationService(EvaluationRepository evaluationRepository, UserRepository userRepository, UserService userService) {
         this.evaluationRepository = evaluationRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Transactional
-    public EvaluationCreateResponseDto createEvaluation(Long evaluatorId, EvaluationRequestDto requestDto) {
+    public EvaluationCreateResponseDto createEvaluation(EvaluationRequestDto requestDto) {
+        Long evaluatorId = userService.getCurrentUser().getId();
+
         if (evaluatorId.equals(requestDto.getTargetUserId())) {
-            throw new IllegalArgumentException("자기 자신을 평가할 수 없습니다.");
+            throw new CustomException(ErrorCode.SELF_EVALUATION_NOT_ALLOWED);
         }
 
         Evaluation evaluation = new Evaluation(
@@ -37,9 +44,11 @@ public class EvaluationService {
         evaluationRepository.save(evaluation);
 
         Double newAverageScore = evaluationRepository.findAverageScoreByUserId(requestDto.getTargetUserId());
-        if (newAverageScore != null) {
-            userRepository.updateUserScore(requestDto.getTargetUserId(), newAverageScore);
+        if (newAverageScore == null) {
+            newAverageScore = 0.0;
         }
+        userRepository.updateUserScore(requestDto.getTargetUserId(), newAverageScore);
+
 
         return EvaluationCreateResponseDto.builder()
                 .evaluationId(evaluation.getEvaluationId())
@@ -47,7 +56,8 @@ public class EvaluationService {
                 .build();
     }
 
-    public WrittenEvaluationsResponseDto getEvaluationsByEvaluator(Long evaluatorId) {
+    public WrittenEvaluationsResponseDto getEvaluationsByEvaluator() {
+        Long evaluatorId = userService.getCurrentUser().getId();
         List<Evaluation> evaluations = evaluationRepository.findAllByEvaluatorId(evaluatorId);
 
         List<EvaluationResponseDto.EvaluationDetail> evaluationDetails = evaluations.stream()
@@ -66,7 +76,8 @@ public class EvaluationService {
                 .build();
     }
 
-    public ReceivedEvaluationsResponseDto getEvaluationsByUser(Long targetUserId) {
+    public ReceivedEvaluationsResponseDto getEvaluationsByUser() {
+        Long targetUserId = userService.getCurrentUser().getId();
         List<Evaluation> evaluations = evaluationRepository.findAllByTargetUserId(targetUserId);
 
         double averageScore = evaluations.stream()

@@ -62,6 +62,8 @@ public enum ErrorCode {
     // LeaderType Error
     INVALID_LEADER_ACTION_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 LeaderActionType 입니다."),
 
+    // Evaluation Error
+    SELF_EVALUATION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신을 평가할 수 없습니다."),
     ;
 
     private final HttpStatus status;
