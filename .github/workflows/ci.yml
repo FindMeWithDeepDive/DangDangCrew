@@ -51,6 +51,8 @@ jobs:
         run: |
           export DB_NAME DB_USERNAME DB_PASSWORD JWT_SECRET KAKAO_MAP_API_KEY
           ./gradlew build -Dspring.profiles.active=dev
+      - name: YML 파일 확인
+        run: cat src/main/resources/application.yml
 
       - name: Docker Buildx 설치
         uses: docker/setup-buildx-action@v2
