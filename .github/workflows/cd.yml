@@ -17,7 +17,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }} # 서버 호스트
           port: 22
-          user: ubuntu # 서버 사용자 이름
+          user: ubuntu # 서버 사용자 이름 - 리눅스랑, 우분투랑 다름
           key:  ${{ secrets.PRIVATE_KEY }}# ssh 접근 권한 정보(ex:pum key)
           first_ssh: |
             echo 배포 시작
