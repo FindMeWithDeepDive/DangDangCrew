@@ -22,6 +22,11 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      DB-NAME: ${{ secrets.DB_NAME }}
+      DB-USERNAME: ${{ secrets.DB_USERNAME }}
+      DB-PASSWORD: ${{ secrets.DB_PASSWORD }}
+      JWT-SECRET: ${{ secrets.JWT_SECRET }}
+      KAKAO-MAP-API-KEY: ${{ secrets.KAKAO_MAP_API_KEY }}
       TAG: latest
 
     steps:
@@ -41,16 +46,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Gradle build를 수행합니다 (환경변수 포함)
-        env:
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          KAKAO_MAP_API_KEY: ${{ secrets.KAKAO_MAP_API_KEY }}
-        run: |
-          export DB_NAME DB_USERNAME DB_PASSWORD JWT_SECRET KAKAO_MAP_API_KEY
-          ./gradlew build -Dspring.profiles.active=dev
+      - name: Gradle build를 수행합니다
+        run: ./gradlew build -Dspring.profiles.active=dev
+
       - name: YML 파일 확인
         run: cat src/main/resources/application.yml
 
