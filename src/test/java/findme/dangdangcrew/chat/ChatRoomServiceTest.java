@@ -104,4 +104,15 @@ public class ChatRoomServiceTest {
         verify(chatParticipantRepository, times(1)).deleteByChatRoomAndUser(chatRoom, user);
     }
 
+    @Test
+    @DisplayName("채팅방에서 이미 퇴장한 경우 퇴장에 실패한다.")
+    void leaveChatRoom_Fail() {
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
+        when(chatParticipantRepository.findByChatRoomAndUser(any(ChatRoom.class), any(User.class)))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatRoomService.leaveRoom(1L, user))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.ALREADY_LEFT.getMessage());
+    }
 }
