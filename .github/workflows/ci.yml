@@ -42,13 +42,14 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Gradle build를 수행합니다 (환경변수 포함)
+        env:
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          KAKAO_MAP_API_KEY: ${{ secrets.KAKAO_MAP_API_KEY }}
         run: |
-          DB_NAME=${{ secrets.DB_NAME }} \
-          DB_USERNAME=${{ secrets.DB_USERNAME }} \
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          KAKAO_MAP_API_KEY=${{ secrets.KAKAO_MAP_API_KEY }} \
-          ./gradlew build -Dspring.profiles.active=dev
+           ./gradlew build -Dspring.profiles.active=dev
 
       - name: Docker Buildx 설치
         uses: docker/setup-buildx-action@v2
