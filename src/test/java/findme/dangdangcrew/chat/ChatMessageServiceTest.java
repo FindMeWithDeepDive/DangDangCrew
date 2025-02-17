@@ -63,4 +63,13 @@ public class ChatMessageServiceTest {
         verify(chatMessageRepository).save(any(ChatMessage.class));
     }
 
+    @Test
+    @DisplayName("메시지 저장에 실패한다.(MessageType이 TALK가 아닌 경우)")
+    void saveMessage_Fail() {
+        requestDto.setType(MessageType.ENTER);
+
+        chatMessageService.saveMessage(requestDto, 1L, user);
+
+        verify(chatMessageRepository).save(any(ChatMessage.class));
+    }
 }
