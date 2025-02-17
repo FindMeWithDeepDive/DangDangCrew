@@ -2,9 +2,11 @@ package findme.dangdangcrew.notification.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import findme.dangdangcrew.chat.repository.ChatMessageRepository;
+import findme.dangdangcrew.global.config.JwtTokenProvider;
 import findme.dangdangcrew.notification.domain.NotificationEntity;
 import findme.dangdangcrew.notification.domain.NotificationType;
 import findme.dangdangcrew.notification.repository.NotificationRepository;
+import findme.dangdangcrew.place.service.PlaceService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +46,10 @@ class NotificationControllerTest {
     private UserRepository userRepository;
     @MockitoBean
     private ChatMessageRepository chatMessageRepository;
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
+    @MockitoBean
+    private PlaceService placeService;
 
     private User testUser;
     @BeforeEach
