@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // User Error
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
+    NULL_POINT(HttpStatus.BAD_REQUEST, "userId값이 비어있습니다."),
 
     // User Register Error
     EMAIL_ALREADY_IN_USE(HttpStatus.BAD_REQUEST, "이미 사용 중인 이메일입니다."),
@@ -40,6 +41,11 @@ public enum ErrorCode {
     MEETING_INSUFFICIENT_PEOPLE(HttpStatus.BAD_REQUEST, "현재 인원은 1명 미만이 될 수 없습니다."),
     NOT_LEADER(HttpStatus.BAD_REQUEST, "현재 로그인한 유저는 리더가 아닙니다."),
     NOT_CHANGE(HttpStatus.BAD_REQUEST, "이전 상태와 동일합니다."),
+    MEETING_USER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "해당 유저는 이 모임에 속해있지 않습니다."),
+    MEETING_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "신청 내역이 존재합니다."),
+    MEETING_LEADER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 모임의 리더를 찾을 수 없습니다."),
+    INVALID_MEETING_CAPACITY(HttpStatus.BAD_REQUEST, "모임의 인원은 최소 2명, 최대 10명이어야 합니다."),
+    LEADER_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, "리더는 참가 취소를 할 수 없습니다."),
 
     // Invalidation Error
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
@@ -50,6 +56,7 @@ public enum ErrorCode {
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
     ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 채팅방에 참여한 사용자입니다."),
     ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 채팅방을 나간 사용자입니다."),
+    UNAUTHORIZED_SUBSCRIBE(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
 
     // JWT Token Error
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
