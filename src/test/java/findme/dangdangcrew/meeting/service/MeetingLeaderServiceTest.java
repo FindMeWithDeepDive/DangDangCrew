@@ -3,11 +3,7 @@ package findme.dangdangcrew.meeting.service;
 import findme.dangdangcrew.global.exception.CustomException;
 import findme.dangdangcrew.global.exception.ErrorCode;
 import findme.dangdangcrew.global.publisher.EventPublisher;
-import findme.dangdangcrew.meeting.MeetingTestData;
-import findme.dangdangcrew.meeting.dto.MeetingDetailResponseDto;
-import findme.dangdangcrew.meeting.dto.MeetingRequestDto;
-import findme.dangdangcrew.meeting.dto.MeetingUserResponseDto;
-import findme.dangdangcrew.meeting.dto.MeetingUserStatusUpdateRequestDto;
+import findme.dangdangcrew.meeting.dto.*;
 import findme.dangdangcrew.meeting.entity.Meeting;
 import findme.dangdangcrew.meeting.entity.UserMeeting;
 import findme.dangdangcrew.meeting.entity.enums.MeetingStatus;
@@ -15,7 +11,6 @@ import findme.dangdangcrew.meeting.entity.enums.UserMeetingStatus;
 import findme.dangdangcrew.meeting.mapper.MeetingMapper;
 import findme.dangdangcrew.meeting.repository.MeetingRepository;
 import findme.dangdangcrew.notification.event.LeaderActionEvent;
-import findme.dangdangcrew.place.domain.Place;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static findme.dangdangcrew.meeting.MeetingTestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -51,63 +47,44 @@ public class MeetingLeaderServiceTest {
     private MeetingMapper meetingMapper;
 
     @Mock
-    private MeetingRepository meetingRepository;
-
-    @Mock
     private EventPublisher eventPublisher;
 
+    @Mock
+    private MeetingRepository meetingRepository;
+
     private Meeting meeting;
-    private User leader;
+    private Meeting closedMeeting;
     private User applicant;
+    private UserMeeting leaderMeeting;
     private UserMeeting userMeeting;
-    private Place place;
     private MeetingUserResponseDto meetingUserResponseDto;
     private MeetingUserStatusUpdateRequestDto meetingUserStatusUpdateRequestDto;
-    private MeetingUserStatusUpdateRequestDto meetingUserStatusUpdateRequestDto_Cancelled;
-    private MeetingDetailResponseDto changeMeetingDetailResponseDto;
-    private MeetingRequestDto changeMeetingRequestDto;
 
     @BeforeEach
     void setup() {
-        leader = MeetingTestData.createUser();
-        applicant = MeetingTestData.createUser1();
-        place = MeetingTestData.createPlace();
-        meeting = MeetingTestData.createMeeting(place);
-        userMeeting = MeetingTestData.createUserMeeting(leader, meeting);
-        meetingUserResponseDto = MeetingTestData.createMeetingUserResponseDto(userMeeting);
-        meetingUserStatusUpdateRequestDto = MeetingTestData.createMeetingUserStatusUpdateRequestDto();
-        meetingUserStatusUpdateRequestDto_Cancelled = MeetingTestData.createMeetingUserStatusUpdateRequestDto_Cancelled();
-        changeMeetingDetailResponseDto = createMeetingRequestDto();
-        changeMeetingRequestDto = createChangeStatusMeetingRequestDto();
-    }
-
-    private MeetingDetailResponseDto createMeetingRequestDto() {
-        return MeetingDetailResponseDto.builder()
-                .meetingName("수정된 모임")
-                .information("수정된 모임입니다.")
-                .maxPeople(10)
-                .build();
-    }
-
-    private MeetingRequestDto createChangeStatusMeetingRequestDto(){
-        return MeetingRequestDto.builder()
-                .meetingName("수정된 모임")
-                .information("수정된 모임입니다.")
-                .maxPeople(2)
-                .placeRequestDto(MeetingTestData.createPlaceRequestDto())
-                .build();
+        User leader = createUser();
+        applicant = createUser1();
+        meeting = createMeeting(MeetingStatus.IN_PROGRESS);
+        closedMeeting = createMeeting(MeetingStatus.CLOSED);
+        leaderMeeting = createUserMeeting(leader, meeting, UserMeetingStatus.LEADER);
+        userMeeting = createUserMeeting(applicant, meeting, UserMeetingStatus.CONFIRMED);
+        meetingUserResponseDto = createMeetingUserResponseDto(leaderMeeting);
+        meetingUserStatusUpdateRequestDto = createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.ATTENDED);
     }
 
     @Test
     @DisplayName("[✅모임 신청 상태 변경] - 리더가 신청자의 상태를 성공적으로 변경합니다.")
-    void changeMeetingApplicationStatusByLeader_Accept(){
+    void changeMeetingApplicationStatusByLeader_Accept() {
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
         doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
         when(userService.getUser(applicant.getId())).thenReturn(applicant);
-        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(userMeeting);
-        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CONFIRMED)).thenReturn(userMeeting);
-        when(meetingMapper.toUserDto(userMeeting)).thenReturn(meetingUserResponseDto);
 
+        meetingUserStatusUpdateRequestDto = createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.CONFIRMED);
+        leaderMeeting = createUserMeeting(applicant, meeting, UserMeetingStatus.WAITING);
+
+        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(leaderMeeting);
+        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CONFIRMED)).thenReturn(leaderMeeting);
+        when(meetingMapper.toUserDto(leaderMeeting)).thenReturn(meetingUserResponseDto);
         MeetingUserResponseDto response = meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), meetingUserStatusUpdateRequestDto);
 
         assertNotNull(response);
@@ -116,25 +93,21 @@ public class MeetingLeaderServiceTest {
     }
 
     @Test
-    @DisplayName("[✅모임 신청 승인] - 모임 신청 승인시 현재 인원이 증가해야 합니다.")
+    @DisplayName("[✅모임 신청 승인] - 모임 신청 승인 시 현재 인원이 증가해야 합니다.")
     void changeMeetingApplicationStatusByLeader_IncreasePeople() {
-        UserMeeting userMeeting = UserMeeting.builder()
-                .id(3L)
-                .status(UserMeetingStatus.WAITING)
-                .meeting(meeting)
-                .user(applicant)
-                .build();
+        UserMeeting waitingUserMeeting = createUserMeeting(applicant, meeting, UserMeetingStatus.WAITING);
+
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
         doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
         when(userService.getUser(applicant.getId())).thenReturn(applicant);
-        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(userMeeting);
-        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CONFIRMED)).thenReturn(userMeeting);
-        when(meetingMapper.toUserDto(userMeeting)).thenReturn(meetingUserResponseDto);
+        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(waitingUserMeeting);
+        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CONFIRMED)).thenReturn(waitingUserMeeting);
+        when(meetingMapper.toUserDto(waitingUserMeeting)).thenReturn(meetingUserResponseDto);
         doNothing().when(eventPublisher).publisher(any(LeaderActionEvent.class));
 
         int beforePeople = meeting.getCurPeople();
 
-        MeetingUserResponseDto result = meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), meetingUserStatusUpdateRequestDto);
+        MeetingUserResponseDto result = meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.CONFIRMED));
 
         assertNotNull(result);
         assertEquals(beforePeople + 1, meeting.getCurPeople());
@@ -144,23 +117,19 @@ public class MeetingLeaderServiceTest {
     @Test
     @DisplayName("[✅모임 신청 강퇴] - 참가자 강퇴 시 현재 인원이 감소해야 합니다.")
     void changeMeetingApplicationStatusByLeader_DecreasePeople() {
-        UserMeeting userMeeting = UserMeeting.builder()
-                .id(3L)
-                .status(UserMeetingStatus.CONFIRMED)
-                .meeting(meeting)
-                .user(applicant)
-                .build();
+        UserMeeting confirmedUserMeeting = createUserMeeting(applicant, meeting, UserMeetingStatus.CONFIRMED);
+
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
         doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
         when(userService.getUser(applicant.getId())).thenReturn(applicant);
-        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(userMeeting);
-        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CANCELLED)).thenReturn(userMeeting);
-        when(meetingMapper.toUserDto(userMeeting)).thenReturn(meetingUserResponseDto);
+        when(userMeetingService.getUserMeeting(meeting, applicant)).thenReturn(confirmedUserMeeting);
+        when(userMeetingService.updateMeetingStatus(meeting, applicant, UserMeetingStatus.CANCELLED)).thenReturn(confirmedUserMeeting);
+        when(meetingMapper.toUserDto(confirmedUserMeeting)).thenReturn(meetingUserResponseDto);
         doNothing().when(eventPublisher).publisher(any(LeaderActionEvent.class));
 
         int beforePeople = meeting.getCurPeople();
 
-        MeetingUserResponseDto result = meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), meetingUserStatusUpdateRequestDto_Cancelled);
+        MeetingUserResponseDto result = meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.CANCELLED));
 
         assertNotNull(result);
         assertEquals(beforePeople - 1, meeting.getCurPeople());
@@ -168,24 +137,12 @@ public class MeetingLeaderServiceTest {
     }
 
     @Test
-    @DisplayName("[❌모임 신청 상태 변경] - 리더가 아닌 유저가 모임 신청 상태를 변경하려고 하는 경우 예외를 발생시킵니다.")
-    void changeMeetingApplicationStatusByLeader_NotLeader() {
-        when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
-        doThrow(new CustomException(ErrorCode.NOT_LEADER)).when(userMeetingService).verifyLeaderPermission(meeting);
-
-        CustomException exception = assertThrows(CustomException.class, () ->
-                meetingLeaderService.changeMeetingApplicationStatusByLeader(meeting.getId(), meetingUserStatusUpdateRequestDto));
-
-        assertEquals(ErrorCode.NOT_LEADER, exception.getErrorCode());
-    }
-
-    @Test
     @DisplayName("[✅ 모임 신청자 조회] - 리더가 모임 신청자들 목록을 성공적으로 조회합니다.")
     void readAllApplications() {
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
         doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
-        when(userMeetingService.findWaitingByMeetingId(meeting)).thenReturn(List.of(userMeeting));
-        when(meetingMapper.toListUserDto(List.of(userMeeting))).thenReturn(List.of(meetingUserResponseDto));
+        when(userMeetingService.findWaitingByMeetingId(meeting)).thenReturn(List.of(leaderMeeting));
+        when(meetingMapper.toListUserDto(List.of(leaderMeeting))).thenReturn(List.of(meetingUserResponseDto));
 
         List<MeetingUserResponseDto> result = meetingLeaderService.readAllApplications(meeting.getId());
 
@@ -194,114 +151,122 @@ public class MeetingLeaderServiceTest {
     }
 
     @Test
-    @DisplayName("[✅모임 수정] - 리더가 모임을 성공적으로 수정합니다.")
-    void updateMeeting() {
+    @DisplayName("[✅모임 종료] - 리더가 모임을 종료하면 상태가 'CLOSED'로 변경됩니다.")
+    void quitMeeting_Success() {
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
         doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
-        doNothing().when(meetingService).validateMeetingCapacity(changeMeetingRequestDto.getMaxPeople());
-        when(meetingMapper.toDto(meeting)).thenReturn(changeMeetingDetailResponseDto);
+        when(userMeetingService.findConfirmedByMeetingId(meeting)).thenReturn(List.of(leaderMeeting));
+        when(meetingMapper.toListMeetingUsersDto(List.of(leaderMeeting))).thenReturn(List.of(meetingUserResponseDto));
 
-        MeetingDetailResponseDto result = meetingLeaderService.updateMeeting(meeting.getId(), changeMeetingRequestDto);
+        List<MeetingUserResponseDto> result = meetingLeaderService.quitMeeting(meeting.getId());
 
-        assertNotNull(result);
-        verify(meetingService, times(1)).findProgressMeeting(meeting.getId());
+        assertEquals(MeetingStatus.CLOSED, meeting.getStatus());
+        assertEquals(1, result.size());
+        verify(meetingService).findProgressMeeting(meeting.getId());
+        verify(userMeetingService).verifyLeaderPermission(meeting);
     }
 
     @Test
-    @DisplayName("[❌모임 수정] - 최대 인원이 2명 이상 10명 이하가 아니라 예외를 발생시킵니다.")
-    void updateMeeting_InvalidMaxPeople_Fail() {
+    @DisplayName("[❌모임 종료] - 리더가 아닌 유저가 종료 시 예외가 발생합니다.")
+    void quitMeeting_NoPermission_Fail() {
         when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
+        doThrow(new CustomException(ErrorCode.NOT_LEADER)).when(userMeetingService).verifyLeaderPermission(meeting);
 
-        doThrow(new CustomException(ErrorCode.INVALID_MEETING_CAPACITY))
-                .when(meetingService).validateMeetingCapacity(anyInt());
+        CustomException exception = assertThrows(CustomException.class, () ->
+                meetingLeaderService.quitMeeting(meeting.getId())
+        );
 
-        changeMeetingRequestDto = MeetingRequestDto.builder()
-                .meetingName("잘못된 모임")
-                .information("테스트")
-                .maxPeople(11)
-                .placeRequestDto(MeetingTestData.createPlaceRequestDto())
-                .build();
-
-        CustomException exception = assertThrows(CustomException.class,
-                () -> meetingLeaderService.updateMeeting(meeting.getId(), changeMeetingRequestDto));
-
-        assertEquals(ErrorCode.INVALID_MEETING_CAPACITY, exception.getErrorCode());
-
-        verify(meetingService, times(1)).validateMeetingCapacity(anyInt());
+        assertEquals(ErrorCode.NOT_LEADER, exception.getErrorCode());
     }
 
     @Test
-    @DisplayName("[✅ 모임 삭제] - 리더가 모임을 성공적으로 삭제합니다.")
-    void deleteMeeting() {
-        Meeting spyMeeting = spy(meeting);
+    @DisplayName("[❌모임 종료] - 종료하고자 하는 모임을 찾을 수 없을 경우 예외가 발생합니다.")
+    void quitMeeting_NotFoundMeeting_Fail() {
+        Long nonExistingMeetingId = 999L;
+        doThrow(new CustomException(ErrorCode.MEETING_NOT_FOUND)).when(meetingService).findProgressMeeting(nonExistingMeetingId);
 
-        when(meetingService.findProgressMeeting(spyMeeting.getId())).thenReturn(spyMeeting);
-        doNothing().when(userMeetingService).verifyLeaderPermission(spyMeeting);
-
-        meetingLeaderService.deleteMeeting(spyMeeting.getId());
-
-        verify(userMeetingService, times(1)).delete(spyMeeting);
-        verify(spyMeeting, times(1)).updateMeetingStatus(MeetingStatus.DELETED);
-
-        assertEquals(MeetingStatus.DELETED, spyMeeting.getStatus());
-    }
-
-    @Test
-    @DisplayName("[❌ 모임 삭제] - 해당 모임을 찾지 못해 예외를 발생시킵니다.")
-    void deleteMeeting_NotFound_Fail() {
-        when(meetingService.findProgressMeeting(999L)).thenThrow(new CustomException(ErrorCode.MEETING_NOT_FOUND));
-
-        CustomException exception = assertThrows(CustomException.class, () -> meetingLeaderService.deleteMeeting(999L));
+        CustomException exception = assertThrows(CustomException.class, () ->
+                meetingLeaderService.quitMeeting(nonExistingMeetingId)
+        );
 
         assertEquals(ErrorCode.MEETING_NOT_FOUND, exception.getErrorCode());
     }
 
-
     @Test
-    @DisplayName("[✅ 모임 종료] - 리더가 모임을 성공적으로 종료시킵니다.")
-    void quitMeeting() {
-        when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
-        doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
-        when(userMeetingService.findConfirmedByMeetingId(meeting)).thenReturn(List.of(userMeeting));
+    @DisplayName("[✅참석 여부 변경] - 리더가 참가자의 상태를 정상적으로 변경합니다.")
+    void checkAttendedOrAbsent_Success() {
+        List<MeetingUserStatusUpdateRequestDto> updateDtos = List.of(createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.ATTENDED));
+
+        when(meetingRepository.findByIdAndStatus(closedMeeting.getId(), MeetingStatus.CLOSED)).thenReturn(Optional.ofNullable(closedMeeting));
+        doNothing().when(userMeetingService).verifyLeaderPermission(closedMeeting);
+        when(userMeetingService.findUserMeetingsByMeetingAndUserIds(closedMeeting, List.of(applicant.getId())))
+                .thenReturn(List.of(userMeeting));
         when(meetingMapper.toListMeetingUsersDto(List.of(userMeeting))).thenReturn(List.of(meetingUserResponseDto));
 
-        List<MeetingUserResponseDto> result = meetingLeaderService.quitMeeting(meeting.getId());
+        List<MeetingUserResponseDto> result = meetingLeaderService.checkAttendedOrAbsent(closedMeeting.getId(), updateDtos);
 
-        assertEquals(1, result.size());
-        verify(meetingService, times(1)).findProgressMeeting(meeting.getId());
+        assertNotNull(result);
+        verify(userMeetingService).verifyLeaderPermission(closedMeeting);
+        verify(userMeetingService).findUserMeetingsByMeetingAndUserIds(closedMeeting, List.of(applicant.getId()));
     }
 
     @Test
-    @DisplayName("[✅참석/불참 여부 변경] - 리더가 유저의 참석 여부를 성공적으로 변경시킵니다.")
-    void checkAttendedOrAbsent_Success() {
-        UserMeeting userMeeting = UserMeeting.builder()
-                .id(3L)
-                .status(UserMeetingStatus.CONFIRMED)
-                .meeting(meeting)
-                .user(applicant)
-                .build();
+    @DisplayName("[❌참석 여부 변경] - 리더가 아닌 유저가 변경 시 예외 발생")
+    void checkAttendedOrAbsent_NoPermission_Fail() {
+        when(meetingRepository.findByIdAndStatus(closedMeeting.getId(), MeetingStatus.CLOSED))
+                .thenReturn(Optional.ofNullable(closedMeeting));
 
-        when(meetingRepository.findByIdAndStatus(meeting.getId(), MeetingStatus.CLOSED))
-                .thenReturn(Optional.of(meeting));
-        doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
-        when(userMeetingService.findUserMeetingsByMeetingAndUserIds(eq(meeting), anyList()))
-                .thenReturn(List.of(userMeeting));
-        when(meetingMapper.toListMeetingUsersDto(List.of(userMeeting)))
-                .thenReturn(List.of(meetingUserResponseDto));
+        List<MeetingUserStatusUpdateRequestDto> updateDtos =
+                List.of(createMeetingUserStatusUpdateRequestDto(applicant, UserMeetingStatus.ATTENDED));
 
-        List<MeetingUserStatusUpdateRequestDto> dtos = List.of(
-                MeetingUserStatusUpdateRequestDto.builder()
-                        .userId(applicant.getId())
-                        .status(UserMeetingStatus.ATTENDED)
-                        .build()
-        );
+        doThrow(new CustomException(ErrorCode.NOT_LEADER))
+                .when(userMeetingService).verifyLeaderPermission(closedMeeting);
 
-        List<MeetingUserResponseDto> result = meetingLeaderService.checkAttendedOrAbsent(meeting.getId(), dtos);
+        CustomException exception = assertThrows(CustomException.class, () ->
+                meetingLeaderService.checkAttendedOrAbsent(closedMeeting.getId(), updateDtos));
 
-        assertEquals(1, result.size());
-        verify(meetingRepository, times(1)).findByIdAndStatus(meeting.getId(), MeetingStatus.CLOSED);
-        verify(userMeetingService, times(1)).verifyLeaderPermission(meeting);
-        verify(userMeetingService, times(1)).findUserMeetingsByMeetingAndUserIds(eq(meeting), anyList());
-        verify(meetingMapper, times(1)).toListMeetingUsersDto(List.of(userMeeting));
+        assertEquals(ErrorCode.NOT_LEADER, exception.getErrorCode());
     }
+
+    @Test
+    @DisplayName("[✅모임 삭제] - 리더가 모임을 정상적으로 삭제합니다.")
+    void deleteMeeting_Success() {
+        when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
+        doNothing().when(userMeetingService).verifyLeaderPermission(meeting);
+        doNothing().when(userMeetingService).delete(meeting);
+
+        meetingLeaderService.deleteMeeting(meeting.getId());
+
+        assertEquals(MeetingStatus.DELETED, meeting.getStatus());
+        verify(userMeetingService, times(1)).delete(meeting);
+    }
+
+    @Test
+    @DisplayName("[❌모임 삭제] - 삭제할 모임을 찾을 수 없을 경우 예외 발생")
+    void deleteMeeting_NotFound_Fail() {
+        Long nonExistingMeetingId = 999L;
+        doThrow(new CustomException(ErrorCode.MEETING_NOT_FOUND))
+                .when(meetingService).findProgressMeeting(nonExistingMeetingId);
+
+        CustomException exception = assertThrows(CustomException.class, () ->
+                meetingLeaderService.deleteMeeting(nonExistingMeetingId));
+
+        assertEquals(ErrorCode.MEETING_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("[❌모임 삭제] - 리더가 아닌 유저가 삭제 시 예외 발생")
+    void deleteMeeting_NoPermission_Fail() {
+        // given
+        when(meetingService.findProgressMeeting(meeting.getId())).thenReturn(meeting);
+        doThrow(new CustomException(ErrorCode.NOT_LEADER))
+                .when(userMeetingService).verifyLeaderPermission(meeting);
+
+        // when & then
+        CustomException exception = assertThrows(CustomException.class, () ->
+                meetingLeaderService.deleteMeeting(meeting.getId()));
+
+        assertEquals(ErrorCode.NOT_LEADER, exception.getErrorCode());
+    }
+
 }
