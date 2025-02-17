@@ -14,6 +14,7 @@ import findme.dangdangcrew.chat.service.ChatMessageService;
 import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import java.util.List;
+import net.bytebuddy.build.ToStringPlugin.Enhance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,9 +31,6 @@ public class ChatMessageServiceTest {
 
     @Mock
     private ChatMessageRepository chatMessageRepository;
-
-    @Mock
-    private UserService userService;
 
     private User user;
     private ChatMessage chatMessage;
@@ -94,5 +92,17 @@ public class ChatMessageServiceTest {
         assertThat(result.get(0).getMessage()).isEqualTo("첫 번째 메시지");
         assertThat(result.get(1).getSender()).isEqualTo("user2");
         assertThat(result.get(1).getMessage()).isEqualTo("두 번째 메시지");
+    }
+
+    @Test
+    @DisplayName("채팅 메시지 볼러오기에 성공한다.(메시지가 없는 경우)")
+    void getMessages_Success_NoMessages() {
+        List<ChatMessage> messages = List.of();
+
+        when(chatMessageRepository.findByRoomIdOrderByTimeAsc(1L)).thenReturn(messages);
+
+        List<ChatMessageResponseDto> result = chatMessageService.getMessages(1L);
+
+        assertThat(result).isEmpty();
     }
 }
