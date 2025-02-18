@@ -2,6 +2,8 @@ package findme.dangdangcrew.sse.service;
 
 import findme.dangdangcrew.sse.infrastructure.ClockHolder;
 import findme.dangdangcrew.sse.repository.EmitterRepository;
+import findme.dangdangcrew.user.entity.User;
+import findme.dangdangcrew.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +21,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +32,9 @@ class SseServiceTest {
 
     @Mock
     private ClockHolder clockHolder;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private SseService sseService;
@@ -56,16 +62,18 @@ class SseServiceTest {
     @DisplayName("SSE 구독 시 SseEmitter 를 생성 후 저장합니다.")
     void subscribeTest() {
         // given
-
         Long userId = 1L;
+        User user = mock(User.class);
         String eventId = userId + "_12345";
         SseEmitter testEmitter = new SseEmitter(60*1000L);
 
         when(clockHolder.mills()).thenReturn(12345L);
         when(emitterRepository.save(eq(eventId), any(SseEmitter.class))).thenReturn(testEmitter);
+        when(userService.getCurrentUser()).thenReturn(user);
+        given(user.getId()).willReturn(userId);
 
         // when
-        SseEmitter result = sseService.subscribe(userId);
+        SseEmitter result = sseService.subscribe();
 
         // then
         assertNotNull(result);

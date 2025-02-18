@@ -58,7 +58,7 @@ public class MeetingController {
 
     @GetMapping
     @Operation(summary = "장소별 모임 조회", description = "특정 장소에 생성된 모든 모임을 조회합니다.")
-    public ResponseEntity<ResponseDto<List<MeetingBasicResponseDto>>> getAllMeetingsByPlaceId(@RequestParam String placeId){
+    public ResponseEntity<ResponseDto<List<MeetingBasicResponseDto>>> getAllMeetingsByPlaceId(@RequestParam("placeId") String placeId){
         List<MeetingBasicResponseDto> response = meetingService.findMeetingsByPlaceId(placeId);
         return ResponseEntity.ok(ResponseDto.of(response, "아이디가 " + placeId + "인 장소에 생성된 모든 모임 조회에 성공하였습니다."));
     }

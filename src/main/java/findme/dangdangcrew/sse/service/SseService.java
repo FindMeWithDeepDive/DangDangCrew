@@ -2,6 +2,8 @@ package findme.dangdangcrew.sse.service;
 
 import findme.dangdangcrew.sse.infrastructure.ClockHolder;
 import findme.dangdangcrew.sse.repository.EmitterRepository;
+import findme.dangdangcrew.user.entity.User;
+import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class SseService {
     private final EmitterRepository emitterRepository;
     private final ClockHolder clockHolder;
+    private final UserService userService;
     private static final long TIMEOUT = 1800*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
@@ -30,7 +33,9 @@ public class SseService {
                 .collect(Collectors.toSet());
     }
     
-    public SseEmitter subscribe(Long userId){
+    public SseEmitter subscribe(){
+        User user = userService.getCurrentUser();
+        Long userId = user.getId();
         // 여러개의 SseEmitter를 관리하기 위해, 중복되지 않은 key 값을 생성.
         // 이를 통해 데이터 복구, 덮어쓰기 방지를 할 수 있다.
         String eventId = generateEventId(userId);

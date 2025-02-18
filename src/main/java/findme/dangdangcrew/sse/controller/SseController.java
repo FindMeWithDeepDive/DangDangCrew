@@ -23,8 +23,7 @@ public class SseController {
     // http://localhost:8080/api/v1/sse/subscribe
     @Operation(summary = "유저가 알림을 구독합니다.", description = "헤더의 토큰 기반의 유저가 알림을 구독합니다.")
     @GetMapping(value = "/subscribe",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@RequestParam("userId") Long userId){
-        log.info("userId: {}", userId);
-        return sseService.subscribe(userId);
+    public SseEmitter subscribe(){
+        return sseService.subscribe();
     }
 }
