@@ -55,14 +55,13 @@
 //    @Autowired
 //    private UserRepository userRepository;
 //    @Autowired
-//    private PlaceService placeService;
+//    private JwtTokenProvider jwtTokenProvider;
 //    @Autowired
 //    private ChatMessageRepository chatMessageRepository;
 //    @Autowired
-//    private JwtTokenProvider jwtTokenProvider;
+//    private PlaceService placeService;
 //
 //    private User testUser;
-//    private String testJwt;
 //
 //    @BeforeEach
 //    void init(){
@@ -76,25 +75,16 @@
 //                .password("test1234")
 //                .build();
 //        userRepository.save(testUser);
-//        testJwt = "testJwt";
 //    }
 //
-//    private void setAuthenticationTestUser(){
-//        String email = "test@gmail.com";
-//        SecurityContextHolder.getContext().setAuthentication(
-//                new UsernamePasswordAuthenticationToken(
-//                        email,
-//                        null,
-//                        Collections.emptyList()
-//                )
-//        );
+//    private String generateTestToken(User user) {
+//        return jwtTokenProvider.generateAccessToken(user.getEmail());
 //    }
-//
 //    @Test
 //    @DisplayName("유저의 알림들을 조회합니다.")
 //    void getUserNotificationsTest() throws Exception {
 //        // given
-//        setAuthenticationTestUser();
+//        String testToken = generateTestToken(testUser);
 //        String page = "1";
 //        LocalDateTime now = LocalDateTime.now();
 //        NotificationEntity notificationEntity = NotificationEntity.builder()
@@ -115,7 +105,7 @@
 //        mockMvc.perform(get("/api/v1/notifications")
 //                .param("page", page)
 //                .contentType(MediaType.APPLICATION_JSON)
-//                        .header("Authorization", "Bearer " + testJwt))
+//                        .header("Authorization", "Bearer " + testToken))
 //                .andExpectAll(
 //                        status().isOk(),
 //                        jsonPath("$.msg").value("유저가 즐겨찾기한 장소를 성공적으로 조회하였습니다."),
