@@ -1,0 +1,3 @@
+[submodule "sub_yml_module"]
+	path = sub_yml_module
+	url = https://github.com/FindMeWithDeepDive/sub_yml_module.git
