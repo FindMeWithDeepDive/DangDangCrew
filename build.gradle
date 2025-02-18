@@ -56,8 +56,8 @@ dependencies {
     // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-    // H2
-    runtimeOnly 'com.h2database:h2'
+    //h2
+    testImplementation 'com.h2database:h2'
 
 }
 

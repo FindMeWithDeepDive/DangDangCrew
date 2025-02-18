@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserRequestDto {
 
     @Schema(description = "사용자 이메일", example = "user@example.com")
