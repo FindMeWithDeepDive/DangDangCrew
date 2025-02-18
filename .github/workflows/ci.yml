@@ -47,9 +47,9 @@ jobs:
       - name: Gradle build를 수행합니다
         run: ./gradlew build -Dspring.profiles.active=dev
 
-      - name: JAR 내부 YML 확인
-        run: |
-          unzip -p build/libs/*.jar application.yml
+#      - name: JAR 내부 YML 확인
+#        run: |
+#          unzip -p build/libs/*.jar application.yml
 
       - name: Docker Buildx 설치
         uses: docker/setup-buildx-action@v2
