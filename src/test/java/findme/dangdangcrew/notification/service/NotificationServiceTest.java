@@ -134,7 +134,7 @@ class NotificationServiceTest {
 
         // Mock 설정
         when(userService.getCurrentUser()).thenReturn(testUser);
-        when(notificationRepository.findByTargetUserId(eq(testUser.getId()), any(Pageable.class)))
+        when(notificationRepository.findByTargetUserIdAndIsReadFalse(eq(testUser.getId()), any(Pageable.class)))
                 .thenReturn(notificationPage);
         when(converterFactory.convert(eq(notificationEntities.get(0)))).thenReturn(notification1);
         when(converterFactory.convert(eq(notificationEntities.get(1)))).thenReturn(notification2);

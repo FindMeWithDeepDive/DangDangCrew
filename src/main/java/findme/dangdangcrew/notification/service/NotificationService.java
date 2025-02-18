@@ -36,7 +36,7 @@ public class NotificationService {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page > 0 ? --page : page, 10, sort);
         User user = userService.getCurrentUser();
-        Page<NotificationEntity> pagingNotification = notificationRepository.findByTargetUserId(user.getId(), pageable);
+        Page<NotificationEntity> pagingNotification = notificationRepository.findByTargetUserIdAndIsReadFalse(user.getId(), pageable);
 
         long total = pagingNotification.getTotalElements();
         long pages = pagingNotification.getTotalPages();
