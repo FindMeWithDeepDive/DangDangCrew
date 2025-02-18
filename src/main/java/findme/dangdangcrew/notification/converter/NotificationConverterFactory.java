@@ -16,7 +16,8 @@ public class NotificationConverterFactory {
         this.converters = List.of(
                 new ApplyNotificationConverter(),
                 new NewMeetingNotificationConverter(),
-                new HotPlaceNotificationConverter()
+                new HotPlaceNotificationConverter(),
+                new LeaderActionNotificationConverter()
         );
     }
 

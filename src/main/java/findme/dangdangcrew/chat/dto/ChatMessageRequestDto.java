@@ -9,6 +9,5 @@ public class ChatMessageRequestDto {
     }
 
     private MessageType type;
-    private String sender;
     private String message;
 }

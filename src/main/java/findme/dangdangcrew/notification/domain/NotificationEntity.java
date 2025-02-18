@@ -21,6 +21,7 @@ public class NotificationEntity {
     private String placeId;
     private Long meetingId;
     private Long applyUserId;
+    private Long meetingLeaderId;
     private String message;
     private boolean isRead;
     private LocalDateTime createdAt;
@@ -28,11 +29,12 @@ public class NotificationEntity {
     private NotificationType notificationType;
 
     @Builder
-    public NotificationEntity(Long targetUserId,String placeId, Long meetingId,Long applyUserId, String message, boolean isRead, LocalDateTime createdAt, NotificationType notificationType){
+    public NotificationEntity(Long targetUserId,String placeId, Long meetingId,Long applyUserId,Long meetingLeaderId, String message, boolean isRead, LocalDateTime createdAt, NotificationType notificationType){
         this.targetUserId =targetUserId;
         this.placeId = placeId;
         this.meetingId = meetingId;
         this.applyUserId = applyUserId;
+        this.meetingLeaderId = meetingLeaderId;
         this.message = message;
         this.isRead = isRead;
         this.createdAt = createdAt;

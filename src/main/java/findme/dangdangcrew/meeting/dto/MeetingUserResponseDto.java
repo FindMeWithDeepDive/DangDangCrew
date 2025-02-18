@@ -6,12 +6,12 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MeetingApplicationResponseDto {
+public class MeetingUserResponseDto {
     private Long userId;
 
     private String userName;
 
     private Long meetingId;
 
-    private UserMeetingStatus status;
+    private UserMeetingStatus userMeetingStatus;
 }

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,9 +27,12 @@ public class FavoritePlace {
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
+    private LocalDateTime createdAt;
+
     @Builder
-    public FavoritePlace(User user, Place place){
+    public FavoritePlace(User user, Place place, LocalDateTime createdAt){
         this.user = user;
         this.place = place;
+        this.createdAt = createdAt;
     }
 }

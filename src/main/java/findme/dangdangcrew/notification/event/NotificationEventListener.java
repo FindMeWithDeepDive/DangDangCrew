@@ -1,9 +1,8 @@
 package findme.dangdangcrew.notification.event;
 
-import findme.dangdangcrew.notification.domain.ApplyNotification;
-import findme.dangdangcrew.notification.domain.HotPlaceNotification;
-import findme.dangdangcrew.notification.domain.NewMeetingNotification;
-import findme.dangdangcrew.notification.domain.Notification;
+import findme.dangdangcrew.global.exception.CustomException;
+import findme.dangdangcrew.global.exception.ErrorCode;
+import findme.dangdangcrew.notification.domain.*;
 import findme.dangdangcrew.notification.service.NotificationService;
 import findme.dangdangcrew.place.domain.FavoritePlace;
 import findme.dangdangcrew.place.repository.FavoritePlaceRepository;
@@ -30,7 +29,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleNewMeetingNotification(NewMeetingEvent event) {
         // 보낼 메세지
-        String message = "[" + event.placeName() + "]" + " 에 새로운 모임이 생성되었습니다";
+        String message = makeNewMeetingMessage(event);
 
         // 생성 시각
         LocalDateTime createdAt = LocalDateTime.now();
@@ -62,7 +61,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleHotPlaceNotification(HotPlaceEvent event) {
         // 보낼 메세지
-        String message = "[" + event.placeName() + "]" + " 인기 폭발! 많은 사람들이 관심을 가지고 있어요.";
+        String message = makeHotPlaceMessage(event);
 
         // 생성 시각
         LocalDateTime createdAt = LocalDateTime.now();
@@ -89,7 +88,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleApplyNotification(ApplyEvent event) {
         // 보낼 메세지
-        String message = event.nickname() + " 님께서 "+event.meetingName()+ " 에 참여 하고 싶어 합니다.";
+        String message = makeApplyMessage(event);
 
         // 생성 시각
         LocalDateTime createdAt = LocalDateTime.now();
@@ -109,4 +108,53 @@ public class NotificationEventListener {
         // 비동기 알림 보내기, 새로운 쓰레드에는 트랜잭션이 전파되지 않음
         sseService.sendNotificationToClient(event.targetUserId(), message);
     }
+
+    @EventListener
+    public void handleLeaderActionNotification(LeaderActionEvent event) {
+        // 보낼 메세지
+        String message = makeLeaderActionMessage(event);
+
+        // 생성 시각
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        // MeetingNotification 생성
+        Notification notification = new LeaderActionNotification(
+                event.targetUserId(),
+                message,
+                false,
+                event.meetingId(),
+                createdAt
+        );
+
+        notificationService.saveNotification(notification);
+
+        // 비동기 알림 보내기, 새로운 쓰레드에는 트랜잭션이 전파되지 않음
+        sseService.sendNotificationToClient(event.targetUserId(), message);
+    }
+
+    private String makeNewMeetingMessage(NewMeetingEvent event) {
+        return "[" + event.placeName() + "]" + " 에 새로운 모임이 생성되었습니다";
+    }
+
+    private String makeHotPlaceMessage(HotPlaceEvent event) {
+        return "[" + event.placeName() + "]" + " 인기 폭발! 많은 사람들이 관심을 가지고 있어요.";
+    }
+
+    private String makeApplyMessage(ApplyEvent event) {
+        return event.nickname() + " 님께서 " + event.meetingName() + " 에 참여 하고 싶어 합니다.";
+    }
+    private String makeLeaderActionMessage(LeaderActionEvent event) {
+        LeaderActionType leaderActionType = event.leaderActionType();
+        if(leaderActionType == LeaderActionType.JOIN_REJECTED)
+            return "["+event.meetingName()+"]" + " 모임 참가 신청이 반려되었습니다.";
+
+        if(leaderActionType == LeaderActionType.JOIN_ACCEPTED)
+            return "["+event.meetingName()+"]" + " 모임 참가 신청이 승낙되었습니다.";
+
+        if(leaderActionType == LeaderActionType.KICK_OUT)
+            return "["+event.meetingName()+"]" + " 모임에서 강퇴되었습니다.";
+
+        throw new CustomException(ErrorCode.INVALID_LEADER_ACTION_TYPE);
+    }
+
 }
