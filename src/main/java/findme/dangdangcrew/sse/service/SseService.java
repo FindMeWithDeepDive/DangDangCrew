@@ -50,10 +50,10 @@ public class SseService {
     }
 
     // 실시간 인기 장소 알림 비동기 처리
-    @Async
+    @Async("customTaskExecutor")
     public void broadcastHotPlace(Set<Long> connectedUserIds, String message){
         log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
-        connectedUserIds.forEach(userId -> {
+        connectedUserIds.parallelStream().forEach(userId -> {
             SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
             if (emitter != null) {
                 try {
@@ -63,9 +63,9 @@ public class SseService {
                             .id(eventId)
                             .reconnectTime(RECONNECTION_TIMEOUT)
                             .data(message, MediaType.APPLICATION_JSON));
-                    log.info("알림을 전송합니다. userId={}, payload={}", userId, message);
+                    log.info("알림 전송 완료 - userId={}, payload={}", userId, message);
                 } catch (IOException e) {
-                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
+                    log.error("알림 전송 실패 - userId={}, error={}", userId, e.getMessage());
                 }
             }
         });
