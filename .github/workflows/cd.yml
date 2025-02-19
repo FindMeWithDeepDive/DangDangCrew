@@ -1,8 +1,12 @@
 name: Deploy 자동화
 
 on:
-  push:
-    branches: [ "dev", "main" ]
+#  push:
+#    branches: [ "dev", "main" ]
+  workflow_run:
+    workflows: [ "CI 자동화" ]
+    types:
+      - completed
 
 jobs:
   deploy:
