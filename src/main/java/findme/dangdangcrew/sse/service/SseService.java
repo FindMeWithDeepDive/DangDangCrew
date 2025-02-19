@@ -6,17 +6,15 @@ import findme.dangdangcrew.user.entity.User;
 import findme.dangdangcrew.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -28,6 +26,8 @@ public class SseService {
     private final EmitterRepository emitterRepository;
     private final ClockHolder clockHolder;
     private final UserService userService;
+
+    @Qualifier("customTaskExecutor")
     private final ThreadPoolTaskExecutor customTaskExecutor;
     private static final long TIMEOUT = 1800*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
@@ -102,14 +102,12 @@ public class SseService {
 //    }
 
     @Async("customTaskExecutor")
-    public CompletableFuture<Void> broadcastNewMeeting(Set<Long> userIds, String message) {
-        log.info("[broadcastNewMeeting] 실행 스레드 : {}", Thread.currentThread().getName());
+    public void broadcastNewMeeting(Set<Long> userIds, String message) {
+        log.info("[broadcastNewMeeting] 실행 스레드: {}", Thread.currentThread().getName());
 
-        List<CompletableFuture<Void>> futures = userIds.stream()
-                .map(userId -> CompletableFuture.runAsync(() -> sendSseNotification(userId, message),customTaskExecutor))
-                .toList();
-
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        // 🔹 모든 알림을 비동기 실행 (즉시 반환)
+        userIds.forEach(userId ->
+                CompletableFuture.runAsync(() -> sendSseNotification(userId, message), customTaskExecutor));
     }
 
 
