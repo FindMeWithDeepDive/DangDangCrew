@@ -31,7 +31,7 @@ public class FavoritePlaceController {
         return ResponseEntity.ok(ResponseDto.of(favoritePlace, message));
     }
 
-    @Operation(summary = "유저가 즐겨찾기 한 장소를 조회합니다.", description = "헤더의 토큰 기반의 유저가 장소를 즐겨찾기 합니다.")
+    @Operation(summary = "유저가 즐겨찾기 한 장소를 조회합니다.", description = "헤더의 토큰 기반의 즐겨찾기한 장소를 조회합니다.")
     @GetMapping
     public ResponseEntity<ResponseDto<PagingResponseDto>> getAllFavoritePlace(@RequestParam(name = "page", required = false, defaultValue = "1") int page){
         PagingResponseDto favoritePlaceResponseDtos = favoritePlaceService.getAllFavoritePlace(page);

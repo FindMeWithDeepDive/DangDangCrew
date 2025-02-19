@@ -72,7 +72,7 @@ public class SseService {
     }
 
     // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
-    @Async
+    //@Async
     public void broadcastNewMeeting(Set<Long> userIds, String message){
         log.info("[broadcastNewMeeting] 실행 쓰레드 : {}",Thread.currentThread().getName());
         Map<String, SseEmitter> userEmitters = emitterRepository.findEmittersByUserId(userIds);
