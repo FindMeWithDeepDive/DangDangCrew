@@ -47,7 +47,6 @@ public class NotificationService {
         return PagingResponseDto.of(pages, total, notifications);
     }
 
-
     // 특정 알림 읽음 처리
     @Transactional
     public Long readNotification(Long notificationId){
