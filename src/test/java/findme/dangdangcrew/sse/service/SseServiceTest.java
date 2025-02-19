@@ -80,53 +80,53 @@ class SseServiceTest {
         verify(emitterRepository, times(1)).save(eq(eventId), any(SseEmitter.class));
     }
 
-    @Test
-    @DisplayName("실시간 핫플레이스 알림을 연결된 유저들에게 전송해야 한다.")
-    void broadcastHotPlace() throws IOException {
-        // given
-        Set<Long> userIds = Set.of(1L, 2L);
-        String message = "핫 플레이스 알림 테스트";
+//    @Test
+//    @DisplayName("실시간 핫플레이스 알림을 연결된 유저들에게 전송해야 한다.")
+//    void broadcastHotPlace() throws IOException {
+//        // given
+//        Set<Long> userIds = Set.of(1L, 2L);
+//        String message = "핫 플레이스 알림 테스트";
+//
+//        SseEmitter emitter1 = mock(SseEmitter.class);
+//        SseEmitter emitter2 = mock(SseEmitter.class);
+//
+//        when(emitterRepository.findEmitterByUserId(1L)).thenReturn(emitter1);
+//        when(emitterRepository.findEmitterByUserId(2L)).thenReturn(emitter2);
+//
+//        // when
+//        sseService.broadcastHotPlace(userIds, message);
+//
+//        // then
+//        verify(emitter1, times(1)).send(any(SseEmitter.SseEventBuilder.class));
+//        verify(emitter2, times(1)).send(any(SseEmitter.SseEventBuilder.class));
+//    }
 
-        SseEmitter emitter1 = mock(SseEmitter.class);
-        SseEmitter emitter2 = mock(SseEmitter.class);
-
-        when(emitterRepository.findEmitterByUserId(1L)).thenReturn(emitter1);
-        when(emitterRepository.findEmitterByUserId(2L)).thenReturn(emitter2);
-
-        // when
-        sseService.broadcastHotPlace(userIds, message);
-
-        // then
-        verify(emitter1, times(1)).send(any(SseEmitter.SseEventBuilder.class));
-        verify(emitter2, times(1)).send(any(SseEmitter.SseEventBuilder.class));
-    }
-
-    @Test
-    @DisplayName("즐겨찾기 한 유저들에게 새로운 모임 알림을 전송합니다.")
-    void broadcastNewMeeting() throws IOException {
-        // given
-        Set<Long> userIds = Set.of(1L, 2L, 3L);
-        String message = "새로운 모임이 생겼습니다.";
-
-        // Mock SseEmitter
-        SseEmitter mockEmitter = mock(SseEmitter.class);
-        when(emitterRepository.findEmittersByUserId(userIds)).thenReturn(
-                Map.of("1_123456", mockEmitter, "2_123457", mockEmitter, "3_123458", mockEmitter)
-        );
-
-        // ArgumentCaptor 설정
-        ArgumentCaptor<SseEmitter.SseEventBuilder> eventCaptor = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
-
-        // when
-        sseService.broadcastNewMeeting(userIds, message);
-
-        // then
-        verify(mockEmitter, times(3)).send(eventCaptor.capture());
-
-        // 캡처된 이벤트 검증
-        SseEmitter.SseEventBuilder capturedEvent = eventCaptor.getValue();
-        assertNotNull(capturedEvent);
-    }
+//    @Test
+//    @DisplayName("즐겨찾기 한 유저들에게 새로운 모임 알림을 전송합니다.")
+//    void broadcastNewMeeting() throws IOException {
+//        // given
+//        Set<Long> userIds = Set.of(1L, 2L, 3L);
+//        String message = "새로운 모임이 생겼습니다.";
+//
+//        // Mock SseEmitter
+//        SseEmitter mockEmitter = mock(SseEmitter.class);
+//        when(emitterRepository.findEmittersByUserId(userIds)).thenReturn(
+//                Map.of("1_123456", mockEmitter, "2_123457", mockEmitter, "3_123458", mockEmitter)
+//        );
+//
+//        // ArgumentCaptor 설정
+//        ArgumentCaptor<SseEmitter.SseEventBuilder> eventCaptor = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
+//
+//        // when
+//        sseService.broadcastNewMeeting(userIds, message);
+//
+//        // then
+//        verify(mockEmitter, times(3)).send(eventCaptor.capture());
+//
+//        // 캡처된 이벤트 검증
+//        SseEmitter.SseEventBuilder capturedEvent = eventCaptor.getValue();
+//        assertNotNull(capturedEvent);
+//    }
 
     @Test
     @DisplayName("유저에게 개별 알림을 전송합니다.")

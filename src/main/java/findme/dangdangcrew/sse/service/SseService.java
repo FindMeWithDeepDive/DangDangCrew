@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -56,61 +55,40 @@ public class SseService {
     }
 
     // 실시간 인기 장소 알림 비동기 처리
-    @Async
-    public void broadcastHotPlace(Set<Long> connectedUserIds, String message){
-        log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
-        connectedUserIds.forEach(userId -> {
-            SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
-            if (emitter != null) {
-                try {
-                    String eventId = generateEventId(userId);
-                    emitter.send(SseEmitter.event()
-                            .name("broadcast event")
-                            .id(eventId)
-                            .reconnectTime(RECONNECTION_TIMEOUT)
-                            .data(message, MediaType.APPLICATION_JSON));
-                    log.info("알림을 전송합니다. userId={}, payload={}", userId, message);
-                } catch (IOException e) {
-                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
-                }
-            }
-        });
+    @Async("customTaskExecutor")
+    public void broadcastHotPlace(Set<Long> connectedUserIds, String message) {
+        log.info("[broadcastHotPlace] 실행 스레드: {}", Thread.currentThread().getName());
+
+        connectedUserIds.parallelStream()
+                .map(userId -> {
+                    SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
+                    if (emitter == null) {
+                        log.warn("알림 전송 실패 - userId={} (SseEmitter 없음)", userId);
+                        return CompletableFuture.completedFuture(null);
+                    }
+                    return CompletableFuture.runAsync(() -> sendSseNotification(userId, message), customTaskExecutor);
+                })
+                .forEach(CompletableFuture::join); // 모든 작업 완료 보장 (선택적)
     }
 
-//    // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
-//    @Async("customTaskExecutor")
-//    public void broadcastNewMeeting(Set<Long> userIds, String message){
-//        log.info("[broadcastNewMeeting] 실행 쓰레드 : {}",Thread.currentThread().getName());
-//        Map<String, SseEmitter> userEmitters = emitterRepository.findEmittersByUserId(userIds);
-//        userEmitters.forEach((key, emitter)->{
-//            Long userId = null;
-//            if(emitter != null){
-//                try {
-//                    userId = Long.parseLong(key.split("_")[0]);
-//                    String eventId = generateEventId(userId);
-//                    emitter.send(SseEmitter.event()
-//                            .name("NewMeeting Event")
-//                            .id(eventId)
-//                            .reconnectTime(RECONNECTION_TIMEOUT)
-//                            .data(message, MediaType.APPLICATION_JSON));
-//                    log.info("알림을 전송합니다. userId={} = {}", userId, message);
-//                }catch (IOException e){
-//                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
-//                }
-//            }
-//        });
-//    }
-
+    //장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
     @Async("customTaskExecutor")
     public void broadcastNewMeeting(Set<Long> userIds, String message) {
         log.info("[broadcastNewMeeting] 실행 스레드: {}", Thread.currentThread().getName());
 
-        // 🔹 모든 알림을 비동기 실행 (즉시 반환)
-        userIds.forEach(userId ->
-                CompletableFuture.runAsync(() -> sendSseNotification(userId, message), customTaskExecutor));
+        userIds.parallelStream()
+                .map(userId -> {
+                    SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
+                    if (emitter == null) {
+                        log.warn("알림 전송 실패 - userId={} (SseEmitter 없음)", userId);
+                        return CompletableFuture.completedFuture(null);
+                    }
+                    return CompletableFuture.runAsync(() -> sendSseNotification(userId, message), customTaskExecutor);
+                })
+                .forEach(CompletableFuture::join); // 모든 작업 완료 보장 (선택적)
     }
 
-
+    // 실시간 인기장소 & 즐겨찾기 알림 에서 사용
     private void sendSseNotification(Long userId, String message) {
         SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
         if (emitter != null) {
