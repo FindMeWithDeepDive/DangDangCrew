@@ -8,6 +8,8 @@ import findme.dangdangcrew.place.domain.FavoritePlace;
 import findme.dangdangcrew.place.repository.FavoritePlaceRepository;
 import findme.dangdangcrew.sse.service.SseService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Transactional
+@Log4j2
 public class NotificationEventListener {
 
     private final NotificationService notificationService;
@@ -39,6 +42,11 @@ public class NotificationEventListener {
         Set<Long> userIds = favoritePlaces.stream()
                 .map(favoritePlace -> favoritePlace.getUser().getId())
                 .collect(Collectors.toSet());
+
+        if(favoritePlaces.isEmpty()){
+            log.info("장소에 즐겨찾기를 한 유저가 존재하지 않습니다.");
+            return;
+        }
 
         // MeetingNotification 생성
         List<Notification> notifications = userIds.stream()
@@ -67,10 +75,15 @@ public class NotificationEventListener {
         LocalDateTime createdAt = LocalDateTime.now();
 
         // 현재 연결되어있는 유저들 조회
-        Set<Long> connectUserId = sseService.getConnectedUserIds();
+        Set<Long> connectedUserIds = sseService.getConnectedUserIds();
+
+        if(connectedUserIds.isEmpty()){
+            log.info("현재 핫플레이스 알림을 받을 연결된 유저가 없습니다.");
+            return;
+        }
 
         // HotPlaceNotification 생성
-        List<Notification> notifications = connectUserId.stream()
+        List<Notification> notifications = connectedUserIds.stream()
                 .map(userId -> new HotPlaceNotification(
                         userId,
                         message,
@@ -82,7 +95,7 @@ public class NotificationEventListener {
         notificationService.saveAllNotification(notifications);
         
         // 비동기 알림 보내기, 새로운 쓰레드에서는 트랜잭션이 전파되지 않음
-        sseService.broadcastHotPlace(connectUserId, message);
+        sseService.broadcastHotPlace(connectedUserIds, message);
     }
 
     @EventListener
