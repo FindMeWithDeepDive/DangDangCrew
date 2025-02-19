@@ -8,12 +8,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ public class SseService {
     private final EmitterRepository emitterRepository;
     private final ClockHolder clockHolder;
     private final UserService userService;
+    private final ThreadPoolTaskExecutor customTaskExecutor;
     private static final long TIMEOUT = 1800*1000L;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
@@ -50,10 +56,10 @@ public class SseService {
     }
 
     // 실시간 인기 장소 알림 비동기 처리
-    @Async("customTaskExecutor")
+    @Async
     public void broadcastHotPlace(Set<Long> connectedUserIds, String message){
         log.info("[broadcastHotPlace] 실행 쓰레드 : {}",Thread.currentThread().getName());
-        connectedUserIds.parallelStream().forEach(userId -> {
+        connectedUserIds.forEach(userId -> {
             SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
             if (emitter != null) {
                 try {
@@ -63,36 +69,65 @@ public class SseService {
                             .id(eventId)
                             .reconnectTime(RECONNECTION_TIMEOUT)
                             .data(message, MediaType.APPLICATION_JSON));
-                    log.info("알림 전송 완료 - userId={}, payload={}", userId, message);
+                    log.info("알림을 전송합니다. userId={}, payload={}", userId, message);
                 } catch (IOException e) {
-                    log.error("알림 전송 실패 - userId={}, error={}", userId, e.getMessage());
+                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
                 }
             }
         });
     }
 
-    // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
-    @Async
-    public void broadcastNewMeeting(Set<Long> userIds, String message){
-        log.info("[broadcastNewMeeting] 실행 쓰레드 : {}",Thread.currentThread().getName());
-        Map<String, SseEmitter> userEmitters = emitterRepository.findEmittersByUserId(userIds);
-        userEmitters.forEach((key, emitter)->{
-            Long userId = null;
-            if(emitter != null){
-                try {
-                    userId = Long.parseLong(key.split("_")[0]);
-                    String eventId = generateEventId(userId);
-                    emitter.send(SseEmitter.event()
-                            .name("NewMeeting Event")
-                            .id(eventId)
-                            .reconnectTime(RECONNECTION_TIMEOUT)
-                            .data(message, MediaType.APPLICATION_JSON));
-                    log.info("알림을 전송합니다. userId={} = {}", userId, message);
-                }catch (IOException e){
-                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
-                }
+//    // 장소에 즐겨찾기 한 유저들한테 알림 비동기 처리
+//    @Async("customTaskExecutor")
+//    public void broadcastNewMeeting(Set<Long> userIds, String message){
+//        log.info("[broadcastNewMeeting] 실행 쓰레드 : {}",Thread.currentThread().getName());
+//        Map<String, SseEmitter> userEmitters = emitterRepository.findEmittersByUserId(userIds);
+//        userEmitters.forEach((key, emitter)->{
+//            Long userId = null;
+//            if(emitter != null){
+//                try {
+//                    userId = Long.parseLong(key.split("_")[0]);
+//                    String eventId = generateEventId(userId);
+//                    emitter.send(SseEmitter.event()
+//                            .name("NewMeeting Event")
+//                            .id(eventId)
+//                            .reconnectTime(RECONNECTION_TIMEOUT)
+//                            .data(message, MediaType.APPLICATION_JSON));
+//                    log.info("알림을 전송합니다. userId={} = {}", userId, message);
+//                }catch (IOException e){
+//                    log.error("알림 전송에 실패하였습니다. userId={} - {}", userId, e.getMessage());
+//                }
+//            }
+//        });
+//    }
+
+    @Async("customTaskExecutor")
+    public CompletableFuture<Void> broadcastNewMeeting(Set<Long> userIds, String message) {
+        log.info("[broadcastNewMeeting] 실행 스레드 : {}", Thread.currentThread().getName());
+
+        List<CompletableFuture<Void>> futures = userIds.stream()
+                .map(userId -> CompletableFuture.runAsync(() -> sendSseNotification(userId, message),customTaskExecutor))
+                .toList();
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+
+    private void sendSseNotification(Long userId, String message) {
+        SseEmitter emitter = emitterRepository.findEmitterByUserId(userId);
+        if (emitter != null) {
+            try {
+                String eventId = generateEventId(userId);
+                emitter.send(SseEmitter.event()
+                        .name("NewMeeting Event")
+                        .id(eventId)
+                        .reconnectTime(RECONNECTION_TIMEOUT)
+                        .data(message, MediaType.APPLICATION_JSON));
+                log.info("알림 전송 완료 - userId={}, payload={}", userId, message);
+            } catch (IOException e) {
+                log.error("알림 전송 실패 - userId={}, error={}", userId, e.getMessage());
             }
-        });
+        }
     }
 
     // 유저가 모임 참가 신청 (모임장 알림) | 모임 참가 신청 결과 알림 (참가 신청 유저 알림)
