@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Tag(name = "[SSE] SSE API", description = "사용자에게 실시간으로 알림을 리턴합니다.")
+@Tag(name = "[SSE] SSE API", description = "SSE 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/sse")
@@ -21,7 +21,7 @@ public class SseController {
     private final SseService sseService;
 
     // http://localhost:8080/api/v1/sse/subscribe
-    @Operation(summary = "유저가 알림을 구독합니다.", description = "헤더의 토큰 기반의 유저가 알림을 구독합니다.")
+    @Operation(summary = "알림 구독", description = "헤더의 토큰 기반의 유저가 알림을 구독합니다.")
     @GetMapping(value = "/subscribe",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(){
         return sseService.subscribe();

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "User API", description = "사용자 관련 API")
+@Tag(name = "[User] User API", description = "사용자 관련 API")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class); // ✅ Logger 선언 추가

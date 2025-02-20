@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Tag(name = "[Notification] Notification API", description = "알림을 조회하고 읽음 처리합니다.")
+@Tag(name = "[Notification] Notification API", description = "알림 관련 API")
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 @Validated
