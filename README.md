@@ -10,28 +10,63 @@ PPT 완성되면 지수님께서 작업하신 메인 페이지 여기 넣어도 
 
 </div> 
 
-
-# 0. Getting Started (시작하기)
-배포 링크 혹은 서비스 사용 방법 혹은 제거
-
-<br/>
 <br/>
 
 # 1. Project Overview (프로젝트 개요)
-- 프로젝트 이름: 찾아줘 DangDangCrew?
+- 프로젝트 이름: 찾아줘 ~ DangDangCrew !
 - 프로젝트 설명: 카카오 지도 API를 활용한 반려동물 동반자 찾기 플랫폼
 
 <br/>
 <br/>
 
 # 2. Team Members (팀원 및 팀 소개)
-| 김지민 | 강형준 | 이지수 | 임영광 | 정태민 |
-|:------:|:------:|:------:|:------:|:------:|
-| <img src="https://github.com/user-attachments/assets/c428b758-cb85-45bf-9d6d-ac4e56d7ad41" alt="김지민" width="150"> | <img src="" alt="강형준" width="150"> | <img src="" alt="이지수" width="150"> | <img src="" alt="임영광" width="150"> | <img src="" alt="정태민" width="150"> |
-| BE | BE | BE | BE | BE |
-| [GitHub](https://github.com/ijnim1121) | [GitHub](https://github.com/sukangpunch) | [GitHub](https://github.com/leedidu) | [GitHub](https://github.com/youngkwanglim) | [GitHub](https://github.com/Jung-Taemin) |
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/ijnim1121">
+        <img src="https://github.com/ijnim1121.png?size=100" width="100px;" alt="김지민"/>
+        <br />
+        <sub><b>김지민</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/sukangpunch">
+        <img src="https://github.com/sukangpunch.png?size=100" width="100px;" alt="강형준"/>
+        <br />
+        <sub><b>강형준</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/leedidu">
+        <img src="https://github.com/leedidu.png?size=100" width="100px;" alt="이지수"/>
+        <br />
+        <sub><b>이지수</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/youngkwanglim">
+        <img src="https://github.com/youngkwanglim.png?size=100" width="100px;" alt="임영광"/>
+        <br />
+        <sub><b>임영광</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Jung-Taemin">
+        <img src="https://github.com/Jung-Taemin.png?size=100" width="100px;" alt="정태민"/>
+        <br />
+        <sub><b>정태민</b></sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">BE</td>
+    <td align="center">BE</td>
+    <td align="center">BE</td>
+    <td align="center">BE</td>
+    <td align="center">BE</td>
+  </tr>
+</table>
 
-<br/>
 <br/>
 
 # 3. Key Features (주요 기능)
@@ -63,26 +98,107 @@ PPT 완성되면 지수님께서 작업하신 메인 페이지 여기 넣어도 
 <br/>
 
 # 4. Tasks & Responsibilities (작업 및 역할 분담)
-|  |  |  |
-|-----------------|-----------------|-----------------|
-| 김지민    |  <img src="https://github.com/user-attachments/assets/c428b758-cb85-45bf-9d6d-ac4e56d7ad41" alt="김지민" width="100"> | <ul><li>유저 도메인 개발</li></ul>     |
-| 강형준   |  <img src="" alt="강형준" width="100">| <ul><li>장소 도메인 개발</li><li>알림 도메인 개발</li><li>배포 및 CI/CD 구축</li><li>배포 및 CI/CD 구축</li>모니터링 서버 구축</ul> |
-| 이지수   |  <img src="" alt="이지수" width="100">    |<ul><li>모임 도메인 개발</li><li>프로토타입 제작</li></ul>  |
-| 임영광    |  <img src="" alt="임영광" width="100">    | <ul><li>채팅 도메인 개발</li><li>프로토타입 제작</li></ul>    |
-| 정태민    |  <img src="" alt="정태민" width="100">    | <ul><li>유저 평가 도메인 개발</li></ul>    |
+<table>
+  <tr>
+    <th align="center">작업 유형</th>
+    <th align="center">담당자</th>
+    <th align="center">내용</th>
+  </tr>
+  <tr>
+    <td rowspan="3" align="center" colspan="2"><b>공통 작업</b></td>
+    <td>- 테스트 코드</td>
+  </tr>
+  <tr>
+    <td>- ERD 설계</td>
+  </tr>
+  <tr>
+    <td>- 요구사항 정리 및 사용자 시나리오 작성</td>
+  </tr>
+  <tr>
+    <td rowspan="5" align="center"><b>개별 작업</b></td>
+    <td align="center">
+      <a href="https://github.com/ijnim1121">
+        <img src="https://github.com/ijnim1121.png?size=50" width="50px"><br/>
+        <b>김지민</b>
+      </a>
+    </td>
+    <td>
+      <b>유저 도메인</b><br/>
+      - 회원가입/로그인<br/>
+      - 보안, 인가, 인증 적용 (JWT)
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Jung-Taemin">
+        <img src="https://github.com/Jung-Taemin.png?size=50" width="50px"><br/>
+        <b>정태민</b>
+      </a>
+    </td>
+    <td>
+      <b>유저 평가 도메인</b><br/>
+      - 평점<br/>
+      - 평가 내용
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/sukangpunch">
+        <img src="https://github.com/sukangpunch.png?size=50" width="50px"><br/>
+        <b>강형준</b>
+      </a>
+    </td>
+    <td>
+      <b>장소 도메인</b><br/>
+      <b>알림 도메인</b><br/>
+      - 실시간 인기 정보 알림 시스템 적용 (SSE)<br/>
+      - 배포 및 CI/CD 구축<br/>
+      - 모니터링 서버 구축
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/leedidu">
+        <img src="https://github.com/leedidu.png?size=50" width="50px"><br/>
+        <b>이지수</b>
+      </a>
+    </td>
+    <td>
+      <b>모임 도메인</b><br/>
+      - 모임 상세페이지<br/>
+      - 개인 모임 조회<br/>
+      - 프로토타입 제작
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/youngkwanglim">
+        <img src="https://github.com/youngkwanglim.png?size=50" width="50px"><br/>
+        <b>임영광</b>
+      </a>
+    </td>
+    <td>
+      <b>채팅 도메인</b><br/>
+      - 장소 별 채팅 기능 적용 (WebSocket)<br/>
+      - 프로토타입 제작
+    </td>
+  </tr>
+</table>
 
-<br/>
 <br/>
 
 # 5. Technology Stack (기술 스택)
-## 5.1 Language
 ### Back-end
 <div>
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Java.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringBoot.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringSecurity.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringDataJPA.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/JWT.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Mysql.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/MongoDB.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Redis.png?raw=true" width="80">
+
 </div>
 
 ### Infra
@@ -94,89 +210,143 @@ PPT 완성되면 지수님께서 작업하신 메인 페이지 여기 넣어도 
 <div>
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Github.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Notion.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Docker.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Figma.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Postman.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Swagger.png?raw=true" width="80">
+
+
 </div>
 
 <br />
 
 
 # 6. Project Structure (프로젝트 구조)
-```plaintext
-project/
-├── public/
-│   ├── index.html           # HTML 템플릿 파일
-│   └── favicon.ico          # 아이콘 파일
-├── src/
-│   ├── assets/              # 이미지, 폰트 등 정적 파일
-│   ├── components/          # 재사용 가능한 UI 컴포넌트
-│   ├── hooks/               # 커스텀 훅 모음
-│   ├── pages/               # 각 페이지별 컴포넌트
-│   ├── App.js               # 메인 애플리케이션 컴포넌트
-│   ├── index.js             # 엔트리 포인트 파일
-│   ├── index.css            # 전역 css 파일
-│   ├── firebaseConfig.js    # firebase 인스턴스 초기화 파일
-│   package-lock.json    # 정확한 종속성 버전이 기록된 파일로, 일관된 빌드를 보장
-│   package.json         # 프로젝트 종속성 및 스크립트 정의
-├── .gitignore               # Git 무시 파일 목록
-└── README.md                # 프로젝트 개요 및 사용법
+```bash
+src
+└── main
+    ├── java
+    │   └── findme.dangdangcrew
+    │       ├── chat
+    │       ├── evaluation
+    │       ├── global
+    │       │   ├── config
+    │       │   ├── dto
+    │       │   ├── entity
+    │       │   ├── exception
+    │       │   ├── interceptor
+    │       │   ├── publisher
+    │       │   ├── service
+    │       ├── meeting
+    │       ├── notification
+    │       ├── place
+    │       ├── sse
+    │       ├── user
+    │       │   ├── controller
+    │       │   ├── dto
+    │       │   ├── entity
+    │       │   ├── repository
+    │       │   ├── service
+    │       └── DangdangcrewApplication
+    ├── resources
+    │   └── application.yml
+
 ```
 
 <br/>
 <br/>
 
-# 7. API Documents (API 명세서)
+# 7. ProtoType (프로토타입)
 
-# 8. ProtoType (프로토타입)
-
-# 9. Development Workflow (개발 워크플로우)
+# 8. Development Workflow (개발 워크플로우)
 ## 브랜치 전략 (Branch Strategy)
-우리의 브랜치 전략은 Git Flow를 기반으로 하며, 다음과 같은 브랜치를 사용합니다.
-
-- Main Branch
+- dev Branch
   - 배포 가능한 상태의 코드를 유지합니다.
   - 모든 배포는 이 브랜치에서 이루어집니다.
   
-- {name} Branch
+- feature Branch
   - 팀원 각자의 개발 브랜치입니다.
   - 모든 기능 개발은 이 브랜치에서 이루어집니다.
+  - 브랜치명: 태그-#이슈번호-개발내용
+    - ex) feat-#14-user-api
 
 <br/>
 <br/>
 
-# 10. Git Convention (깃 컨벤션)
-## 기본 구조
-```
-type : subject
+# 9. Git Convention (깃 컨벤션)
 
-body 
-```
+## Label
 
-<br/>
-
-## type 종류
-```
-feat : 새로운 기능 추가
-fix : 버그 수정
-docs : 문서 수정
-style : 코드 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우
-refactor : 코드 리펙토링
-test : 테스트 코드, 리펙토링 테스트 코드 추가
-chore : 빌드 업무 수정, 패키지 매니저 수정
-```
+| 이모지 | 태그 | 설명 |
+|:------:|:------:|:------------------------------------------------|
+| ⚙️ | `build` | 빌드 관련 파일 수정 |
+| ✅ | `ci/cd` | CI/CD 설정 파일 수정 |
+| ✍️ | `comment` | 필요한 주석 추가 및 변경 |
+| 📘 | `docs` | 문서를 개선하거나 내용을 추가 |
+| ✏️ | `style` | 코드 포맷 변경, 세미콜론 누락 등 코드 변경 없음 |
+| ✨ | `feat` | 새로운 기능을 추가할 경우 |
+| ❌ | `remove` | 파일을 삭제하는 작업만 수행한 경우 |
+| 🎨 | `refactor` | 프로덕션 코드 리팩토링 |
+| 💡 | `rename` | 파일 혹은 폴더명을 수정하거나 이동한 경우 |
+| 💡 | `test` | 테스트 추가, 테스트 리팩토링 (프로덕션 코드 변경 X) |
+| 🔨 | `fix` | 버그를 고친 경우 |
 
 <br/>
 
-## 커밋 예시
+## ISSUE TEMPLATE
+이슈명: 내용
+<br/>
+
+ex) 유저 CRUD 기능 추가
 ```
-== ex1
-✨Feat: "회원 가입 기능 구현"
+## 이슈
+### 현재 상황
+- 현재 발생한 문제나 개선이 필요한 상황을 설명해주세요.
 
-SMS, 이메일 중복확인 API 개발
+### 목표
+- 이슈를 통해 달성하고자 하는 목표를 설명해주세요.
 
-== ex2
-📚chore: styled-components 라이브러리 설치
+## 작업 내용
+- [ ] 작업 1
+- [ ] 작업 2
+- [ ] 작업 3
 
-UI개발을 위한 라이브러리 styled-components 설치
+## 스크린샷
+필요한 경우 스크린샷을 첨부해주세요.
+
+## 참고자료
+관련 문서나 링크를 첨부해주세요.
 ```
 
 <br/>
+<br/>
+
+## PR TEMPLATE
+PR명: [#이슈번호] 내용
+<br/>
+
+ex) [#14] 유저 CRUD 기능 추가
+```
+### PR 타입(하나 이상의 PR 타입을 선택해주세요)
+- [X] 기능 추가
+- [ ] 기능 삭제
+- [ ] 버그 수정
+- [ ] 문서 수정
+- [ ] 코드 리팩토링
+- [ ] 테스트 코드 추가 및 리팩토링
+- [ ] 의존성, 환경 변수, 빌드 관련 코드 업데이트
+
+### 반영 브랜치
+ex) dev/feature/join
+
+### 이슈
+[#이슈 번호](이슈 링크)
+
+### 변경 사항
+ex) 로그인 시, 구글 소셜 로그인 기능을 추가했습니다. (구체적으로, 명시적으로 작성)
+
+### 테스트 결과
+ex) 베이스 브랜치에 포함되기 위한 코드는 모두 정상적으로 동작해야 합니다. 결과물에 대한 스크린샷, GIF, 혹은 라이브 데모가 가능하도록 샘플API를 첨부할 수도 있습니다.
+```
+
 <br/>
