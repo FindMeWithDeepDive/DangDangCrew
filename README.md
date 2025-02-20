@@ -17,7 +17,7 @@
 <br/>
 
 # 1. Project Overview (프로젝트 개요)
-- 프로젝트 이름: 찾아줘 ~ DangDangCrew !
+- 프로젝트 이름: DangDangCrew
 - 프로젝트 설명: 카카오 지도 API를 활용한 반려동물 동반자 찾기 플랫폼
 
 <br/>
@@ -273,6 +273,32 @@ src
 <br/>
 
 # 7. ProtoType (프로토타입)
+<table>
+  <tr>
+    <td align="center"><img src="https://github.com/user-attachments/assets/65ed7461-a6ac-4b98-94d1-355cc42b906d" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/5636ea4c-be1b-4d64-8665-ec62eef152b9" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/2ffb3a21-2db4-4610-a52d-3862c3b1fd16" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/3e333b4a-658f-4d53-9cb9-6212ef92dc43" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>로그인</b></td>
+    <td align="center"><b>장소선택</b></td>
+    <td align="center"><b>장소선택 - 모임목록</b></td>
+    <td align="center"><b>알림목록</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/user-attachments/assets/5ea740d4-da39-43d1-89f1-350737cbbbae" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/797493d4-ec47-4041-a4d3-c0a5f425e33a" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/30cbe416-7cc2-44b6-b7e3-f032803acced" width="200"/></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/fe8fe120-2c76-410c-ba62-94c4a53590ed" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>모임소개</b></td>
+    <td align="center"><b>모임관리</b></td>
+    <td align="center"><b>채팅방</b></td>
+    <td align="center"><b>평가창</b></td>
+  </tr>
+</table>
 
 # 8. Development Workflow (개발 워크플로우)
 ## 브랜치 전략 (Branch Strategy)
