@@ -32,7 +32,7 @@ public class EvaluationController {
     }
 
     @GetMapping
-    @Operation(summary = "평가 조회", description = "평가를 조회합니다.")
+    @Operation(summary = "내 평가 조회", description = "평가를 조회합니다.")
     public ResponseEntity<ResponseDto<ReceivedEvaluationsResponseDto>> getEvaluationsByUser() {
         ReceivedEvaluationsResponseDto response = evaluationService.getEvaluationsByUser();
         return ResponseEntity.ok(ResponseDto.of(response, "평가 정보 조회 성공"));

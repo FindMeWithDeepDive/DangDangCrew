@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "[Favorite Place] Favorite Place API", description = "사용자가 장소에 즐겨찾기 합니다.")
+@Tag(name = "[Favorite Place] Favorite Place API", description = "즐겨찾기 장소 관련 API")
 @RestController
 @RequestMapping("/api/v1/favorite-place")
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class FavoritePlaceController {
 
     private final FavoritePlaceService favoritePlaceService;
 
-    @Operation(summary = "유저가 장소를 즐겨찾기로 등록합니다.",description = "헤더의 토큰 기반의 유저가 장소를 즐겨찾기 합니다.")
+    @Operation(summary = "장소 즐겨찾기 등록",description = "헤더의 토큰 기반의 유저가 장소를 즐겨찾기 합니다.")
     @PostMapping
     public ResponseEntity<ResponseDto<FavoritePlaceResponseDto>> registerFavoritePlace(@RequestBody PlaceRequestDto placeRequestDto){
         FavoritePlaceResponseDto favoritePlace = favoritePlaceService.registerFavoritePlace(placeRequestDto);
@@ -31,7 +31,7 @@ public class FavoritePlaceController {
         return ResponseEntity.ok(ResponseDto.of(favoritePlace, message));
     }
 
-    @Operation(summary = "유저가 즐겨찾기 한 장소를 조회합니다.", description = "헤더의 토큰 기반의 즐겨찾기한 장소를 조회합니다.")
+    @Operation(summary = "즐겨찾기 한 장소 조회", description = "헤더의 토큰 기반의 즐겨찾기한 장소를 조회합니다.")
     @GetMapping
     public ResponseEntity<ResponseDto<PagingResponseDto>> getAllFavoritePlace(@RequestParam(name = "page", required = false, defaultValue = "1") int page){
         PagingResponseDto favoritePlaceResponseDtos = favoritePlaceService.getAllFavoritePlace(page);
