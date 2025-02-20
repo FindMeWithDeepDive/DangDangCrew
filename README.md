@@ -2,8 +2,12 @@
 
 <!-- logo -->
 <img src="https://user-images.githubusercontent.com/80824750/208554611-f8277015-12e8-48d2-b2cc-d09d67f03c02.png" width="400"/>
-
-PPT 완성되면 지수님께서 작업하신 메인 페이지 여기 넣어도 예쁠 것 같아요
+<br/>
+<img src="https://github.com/user-attachments/assets/6e57d9f5-40d2-49ae-97bd-6a84a2cfeee5" width="350"/>
+<br/>
+<img src="https://github.com/user-attachments/assets/bce0257f-9587-48ca-8539-3da45763e1a7" width="200"/>
+<br/>
+<br/>
 
 [<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/release-v0.0.0-yellow?style=flat&logo=google-chrome&logoColor=white" />]() 
 <br/> [<img src="https://img.shields.io/badge/프로젝트 기간-2025.02.04~2025.02.21-green?style=flat&logo=&logoColor=white" />]()
